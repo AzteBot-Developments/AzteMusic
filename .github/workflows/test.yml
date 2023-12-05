@@ -1,0 +1,71 @@
+# This workflow is ran on all PRs and pushes to main. It builds the project and runs the automated tests.
+# In the future it could also build and push the containers to the Google Container Registry.
+
+name: test
+
+on:
+  push:
+    branches: [ 'main' ]
+  pull_request:
+
+env:
+  PROJECT_ID: ${{ secrets.GCE_PROJECT }}
+  REPOSITORY: ${{ secrets.GCE_PROJECT_DOCKER_ARTIFACT_REGISTRY }} # TODO: Try and make this follow the instance zone declared in the infrastructure repo ?
+  GCE_INSTANCE_ZONE: europe-west2-c # TODO: Try and make this follow the instance zone declared in the infrastructure repo ?
+  IMAGE: test
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: [ '1.20' ]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set outputs
+        id: vars
+        run: echo "GITHUB_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Setup Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v4
+        with:
+        
+          go-version: ${{ matrix.go-version }}
+
+      - name: Display Go version
+        run: go version
+      
+      - name: Build Go application(s)
+        run: go build -o build ./cmd/... && go build ./internal/...
+
+      - name: 'Docker build'
+        run: |
+          docker build --tag "${{ env.GCE_INSTANCE_ZONE }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.IMAGE }}:${{ steps.vars.outputs.GITHUB_SHA }}" -f cmd/bot-service/Dockerfile .
+  
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: [ '1.20' ]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Display Go version
+        run: go version
+      
+      - name: Setup environment
+        run: |
+          touch .env
+          echo ${{ secrets.ENV_BASE64_STRING }} | base64 --decode > .env
+      
+      - name: Run unit tests
+        run: go test ./internal/... && go test ./pkg/shared/...
