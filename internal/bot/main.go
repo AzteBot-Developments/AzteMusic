@@ -9,9 +9,13 @@ import (
 	"strconv"
 	"syscall"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 var (
+	_ = godotenv.Load(".env")
+
 	urlPattern    = regexp.MustCompile("^https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]?")
 	searchPattern = regexp.MustCompile(`^(.{2})search:(.+)`)
 
