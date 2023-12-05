@@ -26,7 +26,7 @@ env:
   GKE_ZONE: europe-west2-c # TODO: Try and make this follow the instance zone declared in the infrastructure repo ?
   GKE_REGION: europe-west2 # TODO: Try and make this follow the instance zone declared in the infrastructure repo ?
   CLUSTER_NAME: ${{ secrets.GKE_CLUSTER_NAME }}
-  AZTEMUSIC_IMAGE: aztemusic-service-1-go
+  AZTERADIO_IMAGE: aztemusic-service-1-go
 
 jobs:
 
@@ -64,7 +64,7 @@ jobs:
           create_credentials_file: true
           workload_identity_provider: ${{ secrets.GCP_GITHUB_WIP }}
           service_account: ${{ secrets.GCP_GITHUB_SERVICE_ACCOUNT }}
-          access_token_lifetime: '240s'
+          access_token_lifetime: '120s'
       
       - uses: 'docker/login-action@v1'
         name: 'Docker login'
@@ -75,11 +75,11 @@ jobs:
 
       - name: 'Docker build'
         run: |
-          docker build --tag "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTEMUSIC_IMAGE }}:${{ steps.vars.outputs.GITHUB_SHA }}" -f cmd/music-service/Dockerfile .
+          docker build --tag "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTERADIO_IMAGE }}:${{ steps.vars.outputs.GITHUB_SHA }}" -f cmd/music-service/Dockerfile .
 
       - name: 'Docker push'
         run: |
-          docker push "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTEMUSIC_IMAGE }}:${{ steps.vars.outputs.GITHUB_SHA }}"
+          docker push "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTERADIO_IMAGE }}:${{ steps.vars.outputs.GITHUB_SHA }}"
       
       - name: Connect to GKE
         uses: google-github-actions/get-gke-credentials@v0
@@ -94,15 +94,15 @@ jobs:
       
       - name: Remove previous deployments
         run: |
-          kubectl delete deployment --ignore-not-found=true ${{ env.AZTEMUSIC_IMAGE }}-${{ steps.tag_version.outputs.previous_tag }}
+          kubectl delete deployment --ignore-not-found=true azteradio-service-go-${{ steps.tag_version.outputs.previous_tag }}
       
       - name: Create GKE Deployments for new image
         run: |
-          kubectl create deployment ${{ env.AZTEMUSIC_IMAGE }}-${{ steps.tag_version.outputs.previous_tag }} --image="${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTEMUSIC_IMAGE }}:${{ steps.vars.outputs.GITHUB_SHA }}"
+          kubectl create deployment azteradio-service-go-${{ steps.tag_version.outputs.previous_tag }} --image="${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTERADIO_IMAGE }}:${{ steps.vars.outputs.GITHUB_SHA }}"
 
       - name: Scale deployments
         run: |
-          kubectl scale --replicas=1 deployment/${{ env.AZTEMUSIC_IMAGE }}-${{ steps.tag_version.outputs.previous_tag }}
+          kubectl scale --replicas=1 deployment/azteradio-service-go-${{ steps.tag_version.outputs.previous_tag }}
 
       - name: Show created Pods
         run: |
