@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"regexp"
+	"strconv"
 	"syscall"
 	"time"
 )
@@ -14,18 +15,20 @@ var (
 	urlPattern    = regexp.MustCompile("^https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]?")
 	searchPattern = regexp.MustCompile(`^(.{2})search:(.+)`)
 
-	Token   = os.Getenv("BOT_TOKEN")
-	GuildId = os.Getenv("GUILD_ID")
+	Token    = os.Getenv("BOT_TOKEN")
+	BotAppId = os.Getenv("BOT_APP_ID")
+	GuildId  = os.Getenv("GUILD_ID")
 
 	DesignatedChannelId   = os.Getenv("DESIGNATED_VOICE_CHANNEL_ID")
 	DesignatedPlaylistUrl = os.Getenv("DESIGNATED_PLAYLIST_URL")
 	StatusText            = os.Getenv("STATUS_TEXT")
 
-	b = &Bot{
-		Queues: &QueueManager{
-			queues: make(map[string]*Queue),
-		},
-	}
+	NodeName      = os.Getenv("LAVALINK_NODE_NAME")
+	NodeAddress   = os.Getenv("LAVALINK_NODE_ADDRESS")
+	NodePassword  = os.Getenv("LAVALINK_NODE_PASSWORD")
+	NodeSecure, _ = strconv.ParseBool(os.Getenv("LAVALINK_NODE_SECURE"))
+
+	b = NewBot()
 )
 
 func main() {
@@ -40,7 +43,10 @@ func main() {
 	b.AddHandlers()
 
 	// Connect the authenticated bot session to the Discord servers
-	b.Connect()
+	if err := b.Session.Open(); err != nil {
+		panic(err)
+	}
+	defer b.Session.Close()
 
 	// Register the bot's slash commands (play, shuffle, skip, etc.)
 	b.RegisterCommands()

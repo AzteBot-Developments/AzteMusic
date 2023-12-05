@@ -3,22 +3,9 @@ package main
 import (
 	"context"
 	"log"
-	"log/slog"
-	"os"
-	"strconv"
 
 	"github.com/disgoorg/disgolink/v3/disgolink"
 	"github.com/disgoorg/snowflake/v2"
-	"github.com/joho/godotenv"
-)
-
-var (
-	_ = godotenv.Load("./cmd/music-service/.env")
-
-	NodeName      = os.Getenv("LAVALINK_NODE_NAME")
-	NodeAddress   = os.Getenv("LAVALINK_NODE_ADDRESS")
-	NodePassword  = os.Getenv("LAVALINK_NODE_PASSWORD")
-	NodeSecure, _ = strconv.ParseBool(os.Getenv("LAVALINK_NODE_SECURE"))
 )
 
 func (b *Bot) AddLavalinkNode(ctx context.Context) {
@@ -43,8 +30,7 @@ func (b *Bot) AddLavalinkNode(ctx context.Context) {
 	}
 	version, err := node.Version(ctx)
 	if err != nil {
-		slog.Error("failed to get node version", slog.Any("err", err))
-		os.Exit(1)
+		panic(err)
 	}
 	log.Printf("lavalink node version: %s", version)
 }

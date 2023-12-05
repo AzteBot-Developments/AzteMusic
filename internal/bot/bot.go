@@ -12,6 +12,15 @@ type Bot struct {
 	Queues   *QueueManager
 }
 
+func NewBot() *Bot {
+	newBot := &Bot{
+		Queues: &QueueManager{
+			queues: make(map[string]*Queue),
+		},
+	}
+	return newBot
+}
+
 func GetAuthenticatedBotSession() *discordgo.Session {
 	session, err := discordgo.New("Bot " + Token)
 	if err != nil {
@@ -30,11 +39,4 @@ func (b *Bot) AddHandlers() {
 	b.Session.AddHandler(b.onApplicationCommand)
 	b.Session.AddHandler(b.onVoiceStateUpdate)
 	b.Session.AddHandler(b.onVoiceServerUpdate)
-}
-
-func (b *Bot) Connect() {
-	if err := b.Session.Open(); err != nil {
-		panic(err)
-	}
-	defer b.Session.Close()
 }

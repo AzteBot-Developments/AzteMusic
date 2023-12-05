@@ -13,13 +13,16 @@ import (
 )
 
 // Plays a YT track or playlist from the given source URL.
-func (b *Bot) playOnStartupFromUrl(event *discordgo.Ready, url string) error {
+func (b *Bot) PlayOnStartupFromUrl(event *discordgo.Ready, url string) error {
 	identifier := url
 	if !urlPattern.MatchString(identifier) && !searchPattern.MatchString(identifier) {
 		identifier = lavalink.SearchTypeYouTube.Apply(identifier)
 	}
 
+	// DEBUG HERE
 	fmt.Printf("(onReady) GID %s\n", GuildId)
+	fmt.Print(b.Lavalink)
+
 	player := b.Lavalink.Player(snowflake.MustParse(GuildId))
 	queue := b.Queues.Get(GuildId)
 

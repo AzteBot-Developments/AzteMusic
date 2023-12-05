@@ -1,14 +1,20 @@
 package main
 
 import (
+	"context"
 	"log"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/disgoorg/snowflake/v2"
 )
 
 // Called once the Discord servers confirm a succesful connection.
 func (b *Bot) onReady(s *discordgo.Session, event *discordgo.Ready) {
+
+	// Initial Lavalink service connection setup
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	b.AddLavalinkNode(ctx)
 
 	// Any initial setup for the music service !
 	// i.e join designated server, play designated playlist, etc.
@@ -26,8 +32,7 @@ func (b *Bot) onReady(s *discordgo.Session, event *discordgo.Ready) {
 
 		// Play designated playlist
 		if DesignatedPlaylistUrl != "" {
-			_ = b.Lavalink.Player(snowflake.MustParse(GuildId))
-			if err := b.playOnStartupFromUrl(event, DesignatedPlaylistUrl); err != nil {
+			if err := b.PlayOnStartupFromUrl(event, DesignatedPlaylistUrl); err != nil {
 				log.Fatalf("Could not play designated playlist (onReady): %v", err)
 			}
 		}
