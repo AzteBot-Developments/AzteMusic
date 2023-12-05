@@ -73,8 +73,19 @@ var commands = []*discordgo.ApplicationCommand{
 	},
 }
 
-func registerCommands(s *discordgo.Session) {
-	if _, err := s.ApplicationCommandBulkOverwrite(s.State.User.ID, GuildId, commands); err != nil {
+func (b *Bot) RegisterCommands() {
+	b.Handlers = map[string]func(event *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error{
+		"play":        b.play,
+		"pause":       b.pause,
+		"now-playing": b.nowPlaying,
+		"stop":        b.stop,
+		"queue":       b.queue,
+		"clear-queue": b.clearQueue,
+		"queue-type":  b.queueType,
+		"shuffle":     b.shuffle,
+	}
+
+	if _, err := b.Session.ApplicationCommandBulkOverwrite(b.Session.State.User.ID, GuildId, commands); err != nil {
 		panic(err)
 	}
 }

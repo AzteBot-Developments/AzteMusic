@@ -214,7 +214,7 @@ func (b *Bot) play(event *discordgo.InteractionCreate, data discordgo.Applicatio
 		return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: fmt.Sprintf("Error while getting voice state: `%s`", err),
+				Content: "Trebuie sa fiu conectat la un voice channel pentru a da play.",
 			},
 		})
 	}

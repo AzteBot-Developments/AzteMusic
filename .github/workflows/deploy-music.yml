@@ -26,7 +26,7 @@ env:
   GKE_ZONE: europe-west2-c # TODO: Try and make this follow the instance zone declared in the infrastructure repo ?
   GKE_REGION: europe-west2 # TODO: Try and make this follow the instance zone declared in the infrastructure repo ?
   CLUSTER_NAME: ${{ secrets.GKE_CLUSTER_NAME }}
-  AZTEMUSIC_IMAGE: aztemusic-service-go
+  AZTEMUSIC_IMAGE: aztemusic-service-1-go
 
 jobs:
 
@@ -94,15 +94,15 @@ jobs:
       
       - name: Remove previous deployments
         run: |
-          kubectl delete deployment --ignore-not-found=true aztemusic-service-${{ steps.tag_version.outputs.previous_tag }}
+          kubectl delete deployment --ignore-not-found=true ${{ env.AZTEMUSIC_IMAGE }}-${{ steps.tag_version.outputs.previous_tag }}
       
       - name: Create GKE Deployments for new image
         run: |
-          kubectl create deployment aztemusic-service-${{ steps.tag_version.outputs.previous_tag }} --image="${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTEMUSIC_IMAGE }}:${{ steps.vars.outputs.GITHUB_SHA }}"
+          kubectl create deployment ${{ env.AZTEMUSIC_IMAGE }}-${{ steps.tag_version.outputs.previous_tag }} --image="${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTEMUSIC_IMAGE }}:${{ steps.vars.outputs.GITHUB_SHA }}"
 
       - name: Scale deployments
         run: |
-          kubectl scale --replicas=1 deployment/aztemusic-service-${{ steps.tag_version.outputs.previous_tag }}
+          kubectl scale --replicas=1 deployment/${{ env.AZTEMUSIC_IMAGE }}-${{ steps.tag_version.outputs.previous_tag }}
 
       - name: Show created Pods
         run: |
