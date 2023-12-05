@@ -92,7 +92,7 @@ jobs:
       - name: Remove previous deployments
         run: |
           kubectl delete deployment --ignore-not-found=true lavalink-service
-          kubectl delete service lavalink-service
+          kubectl delete service --ignore-not-found=true lavalink-service
       
       - name: Create GKE Deployments for new image
         run: |
