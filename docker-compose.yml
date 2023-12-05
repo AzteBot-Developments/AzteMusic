@@ -1,0 +1,12 @@
+version: '3.9'
+
+services:
+
+  aztemusic-service:
+    container_name: bot-service
+    env_file:
+      ./.env
+    build:
+      dockerfile: ./cmd/music-service/Dockerfile
+    volumes: 
+      - "./logs:/app/logs"
