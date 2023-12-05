@@ -7,3 +7,6 @@ down:
 
 update-lavalink:
 	openssl base64 -A -in internal/lavalink/application.prod.yml -out internal/lavalink/application.prod.yml.out
+
+update-env:
+	openssl base64 -A -in cmd/music-service/.prod.env -out cmd/music-service/.prod.env.out

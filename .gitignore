@@ -28,3 +28,4 @@ application.yml
 .prod.env
 logs/
 application.prod.yml.out
+.prod.env.out

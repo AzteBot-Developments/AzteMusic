@@ -98,6 +98,10 @@ jobs:
       - name: Scale deployments
         run: |
           kubectl scale --replicas=1 deployment/lavalink-service
+      
+      - name: Expose deployments
+        run: |
+          kubectl expose deployment/lavalink-service --type="LoadBalancer" --port=2333 --target-port=2333 --name=${{ env.LAVALINK_IMAGE }}
 
       - name: Show created Pods
         run: |
