@@ -16,7 +16,7 @@ COPY . ./
 COPY ./cmd/music-service/.env ./.env
 
 # Build project
-RUN CGO_ENABLED=0 GOOS=linux go build -o build/main ./internal/bot/main.go 
+RUN CGO_ENABLED=0 GOOS=linux go build -o build/main ./internal/bot
 
 # Other configs
 VOLUME /app/logs
