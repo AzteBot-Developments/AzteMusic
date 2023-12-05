@@ -98,11 +98,11 @@ jobs:
       
       - name: Create GKE Deployments for new image
         run: |
-          kubectl create deployment azteradio-service-go-${{ steps.tag_version.outputs.previous_tag }} --image="${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTERADIO_IMAGE }}:${{ steps.vars.outputs.GITHUB_SHA }}"
+          kubectl create deployment azteradio-service-go-${{ steps.tag_version.outputs.new_tag }} --image="${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTERADIO_IMAGE }}:${{ steps.vars.outputs.GITHUB_SHA }}"
 
       - name: Scale deployments
         run: |
-          kubectl scale --replicas=1 deployment/azteradio-service-go-${{ steps.tag_version.outputs.previous_tag }}
+          kubectl scale --replicas=1 deployment/azteradio-service-go-${{ steps.tag_version.outputs.new_tag }}
 
       - name: Show created Pods
         run: |
