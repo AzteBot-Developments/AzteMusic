@@ -4,3 +4,6 @@ up:
 
 down:
 	docker compose down -v
+
+update-lavalink:
+	openssl base64 -A -in internal/lavalink/application.prod.yml -out internal/lavalink/application.prod.yml.out

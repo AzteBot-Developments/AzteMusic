@@ -2,6 +2,14 @@ version: '3.9'
 
 services:
 
+  lavalink:
+    container_name: lavalink
+    build:
+      dockerfile: ./cmd/lavalink-service/Dockerfile
+    restart: unless-stopped
+    networks:
+      - lavalink
+
   aztemusic:
     container_name: music-service
     env_file:
@@ -10,3 +18,11 @@ services:
       dockerfile: ./cmd/music-service/Dockerfile
     volumes: 
       - "./logs/music-service:/app/logs"
+    networks:
+      - lavalink
+  
+
+networks:
+  # create a lavalink network you can add other containers to, to give them access to Lavalink
+  lavalink:
+    name: lavalink

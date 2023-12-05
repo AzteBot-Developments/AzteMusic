@@ -8,3 +8,7 @@ build/
 *.log
 
 .DS_Store
+
+internal/lavalink/application.prod.yml
+.prod.env
+application.prod.yml.out
