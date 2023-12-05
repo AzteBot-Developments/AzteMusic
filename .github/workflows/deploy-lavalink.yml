@@ -18,6 +18,8 @@ on:
       - 'cmd/radio-service/**'
       - 'internal/bot/**'
       - 'internal/utils/**'
+      - 'go.sum'
+      - 'go.mod'
     branches: [ 'main' ]
 
   workflow_dispatch:
@@ -90,6 +92,7 @@ jobs:
       - name: Remove previous deployments
         run: |
           kubectl delete deployment --ignore-not-found=true lavalink-service
+          kubectl delete service lavalink-service
       
       - name: Create GKE Deployments for new image
         run: |
