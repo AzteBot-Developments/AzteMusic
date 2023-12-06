@@ -5,6 +5,7 @@ FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /app
 
 COPY internal/lavalink ./
+COPY internal/lavalink/application.yml ./application.yml
 
 EXPOSE 2333
 
