@@ -38,7 +38,8 @@ func main() {
 	b.SetIntents()
 
 	// Register the handlers for the Discord session (onReady, onVoiceUpdate, etc.)
-	b.AddHandlers()
+	b.AddVoiceHandlers()
+	b.Session.AddHandler(b.onReady)
 
 	// Connect the authenticated bot session to the Discord servers
 	if err := b.Session.Open(); err != nil {
@@ -49,10 +50,14 @@ func main() {
 	// Register the bot's slash commands (play, shuffle, skip, etc.)
 	b.RegisterCommands()
 
-	// Connect to the associated LavaLink server
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	b.AddLavalinkNode(ctx)
+	// Setup the Lavalink client for the bot if it hasn't been setup already
+	if !b.HasLavaLinkClient {
+		b.SetupLavalink()
+		// Connect to the associated LavaLink server
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		b.AddLavalinkNode(ctx)
+	}
 
 	log.Printf("Discord bot is now running. Press CTRL-C to exit.")
 	s := make(chan os.Signal, 1)

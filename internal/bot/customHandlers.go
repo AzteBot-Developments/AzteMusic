@@ -11,7 +11,8 @@ import (
 // Called once the Discord servers confirm a succesful connection.
 func (b *Bot) onReady(s *discordgo.Session, event *discordgo.Ready) {
 
-	// Initial Lavalink service connection setup
+	// Safety calls
+	b.SetupLavalink()
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	b.AddLavalinkNode(ctx)
@@ -32,7 +33,8 @@ func (b *Bot) onReady(s *discordgo.Session, event *discordgo.Ready) {
 
 		// Play designated playlist on loop, FOREVER :')
 		if DesignatedPlaylistUrl != "" {
-			if err := b.PlayOnStartupFromUrl(event, DesignatedPlaylistUrl); err != nil {
+			repeatPlaylistCount := 10
+			if err := b.PlayOnStartupFromUrl(event, DesignatedPlaylistUrl, repeatPlaylistCount); err != nil {
 				log.Fatalf("Could not play designated playlist (onReady): %v", err)
 			}
 		}

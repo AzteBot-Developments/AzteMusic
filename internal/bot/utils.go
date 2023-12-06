@@ -12,7 +12,7 @@ import (
 )
 
 // Plays a YT track or playlist from the given source URL.
-func (b *Bot) PlayOnStartupFromUrl(event *discordgo.Ready, url string) error {
+func (b *Bot) PlayOnStartupFromUrl(event *discordgo.Ready, url string, repeatCount int) error {
 
 	playlistUrl := url
 
@@ -28,16 +28,30 @@ func (b *Bot) PlayOnStartupFromUrl(event *discordgo.Ready, url string) error {
 
 	var toPlay *lavalink.Track
 	b.Lavalink.BestNode().LoadTracksHandler(ctx, playlistUrl, disgolink.NewResultHandler(
-		nil,
+		func(track lavalink.Track) {
+			if player.Track() == nil {
+				toPlay = &track
+			} else {
+				queue.Add(track)
+			}
+		},
 		func(playlist lavalink.Playlist) {
 			if player.Track() == nil {
 				toPlay = &playlist.Tracks[0]
 				queue.Add(playlist.Tracks[1:]...)
+				// Repeat the queue `repeatCount` times
+				// TODO
 			} else {
 				queue.Add(playlist.Tracks...)
 			}
 		},
-		nil,
+		func(tracks []lavalink.Track) {
+			if player.Track() == nil {
+				toPlay = &tracks[0]
+			} else {
+				queue.Add(tracks[0])
+			}
+		},
 		nil,
 		nil,
 	))
