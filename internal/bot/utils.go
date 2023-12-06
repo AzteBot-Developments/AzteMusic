@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -14,14 +13,12 @@ import (
 
 // Plays a YT track or playlist from the given source URL.
 func (b *Bot) PlayOnStartupFromUrl(event *discordgo.Ready, url string) error {
-	identifier := url
-	if !urlPattern.MatchString(identifier) && !searchPattern.MatchString(identifier) {
-		identifier = lavalink.SearchTypeYouTube.Apply(identifier)
-	}
 
-	// DEBUG HERE
-	fmt.Printf("(onReady) GID %s\n", GuildId)
-	fmt.Print(b.Lavalink)
+	playlistUrl := url
+
+	if !urlPattern.MatchString(playlistUrl) && !searchPattern.MatchString(playlistUrl) {
+		playlistUrl = lavalink.SearchTypeYouTube.Apply(playlistUrl)
+	}
 
 	player := b.Lavalink.Player(snowflake.MustParse(GuildId))
 	queue := b.Queues.Get(GuildId)
@@ -30,14 +27,8 @@ func (b *Bot) PlayOnStartupFromUrl(event *discordgo.Ready, url string) error {
 	defer cancel()
 
 	var toPlay *lavalink.Track
-	b.Lavalink.BestNode().LoadTracksHandler(ctx, identifier, disgolink.NewResultHandler(
-		func(track lavalink.Track) {
-			if player.Track() == nil {
-				toPlay = &track
-			} else {
-				queue.Add(track)
-			}
-		},
+	b.Lavalink.BestNode().LoadTracksHandler(ctx, playlistUrl, disgolink.NewResultHandler(
+		nil,
 		func(playlist lavalink.Playlist) {
 			if player.Track() == nil {
 				toPlay = &playlist.Tracks[0]
@@ -46,13 +37,7 @@ func (b *Bot) PlayOnStartupFromUrl(event *discordgo.Ready, url string) error {
 				queue.Add(playlist.Tracks...)
 			}
 		},
-		func(tracks []lavalink.Track) {
-			if player.Track() == nil {
-				toPlay = &tracks[0]
-			} else {
-				queue.Add(tracks[0])
-			}
-		},
+		nil,
 		nil,
 		nil,
 	))

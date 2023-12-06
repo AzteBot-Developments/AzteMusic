@@ -30,7 +30,7 @@ func (b *Bot) onReady(s *discordgo.Session, event *discordgo.Ready) {
 			log.Fatalf("Could not join designated voice channel (onReady): %v", err)
 		}
 
-		// Play designated playlist
+		// Play designated playlist on loop, FOREVER :')
 		if DesignatedPlaylistUrl != "" {
 			if err := b.PlayOnStartupFromUrl(event, DesignatedPlaylistUrl); err != nil {
 				log.Fatalf("Could not play designated playlist (onReady): %v", err)
