@@ -26,7 +26,7 @@ env:
   GKE_ZONE: europe-west2-c # TODO: Try and make this follow the instance zone declared in the infrastructure repo ?
   GKE_REGION: europe-west2 # TODO: Try and make this follow the instance zone declared in the infrastructure repo ?
   CLUSTER_NAME: ${{ secrets.GKE_CLUSTER_NAME }}
-  AZTERADIO_IMAGE: aztemusic-service-1-go
+  AZTERADIO_IMAGE: azteradio-service-go
 
 jobs:
 

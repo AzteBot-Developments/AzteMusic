@@ -10,8 +10,8 @@ services:
     networks:
       - lavalink
 
-  aztemusic:
-    container_name: music-service
+  azteradio:
+    container_name: radio-service
     env_file:
       ./cmd/radio-service/.env
     build:
