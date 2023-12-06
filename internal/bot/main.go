@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/signal"
 	"regexp"
-	"strconv"
 	"syscall"
 	"time"
 
@@ -26,11 +25,6 @@ var (
 	DesignatedChannelId   = os.Getenv("DESIGNATED_VOICE_CHANNEL_ID")
 	DesignatedPlaylistUrl = os.Getenv("DESIGNATED_PLAYLIST_URL")
 	StatusText            = os.Getenv("STATUS_TEXT")
-
-	NodeName      = os.Getenv("LAVALINK_NODE_NAME")
-	NodeAddress   = os.Getenv("LAVALINK_NODE_ADDRESS")
-	NodePassword  = os.Getenv("LAVALINK_NODE_PASSWORD")
-	NodeSecure, _ = strconv.ParseBool(os.Getenv("LAVALINK_NODE_SECURE"))
 
 	b = NewBot()
 )

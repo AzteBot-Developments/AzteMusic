@@ -3,9 +3,18 @@ package main
 import (
 	"context"
 	"log"
+	"os"
+	"strconv"
 
 	"github.com/disgoorg/disgolink/v3/disgolink"
 	"github.com/disgoorg/snowflake/v2"
+)
+
+var (
+	NodeName      = os.Getenv("LAVALINK_NODE_NAME")
+	NodeAddress   = os.Getenv("LAVALINK_NODE_ADDRESS")
+	NodePassword  = os.Getenv("LAVALINK_NODE_PASSWORD")
+	NodeSecure, _ = strconv.ParseBool(os.Getenv("LAVALINK_NODE_SECURE"))
 )
 
 func (b *Bot) AddLavalinkNode(ctx context.Context) {
