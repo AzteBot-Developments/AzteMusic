@@ -13,11 +13,11 @@ services:
   aztemusic:
     container_name: music-service
     env_file:
-      ./cmd/music-service/.env
+      ./cmd/radio-service/.env
     build:
-      dockerfile: ./cmd/music-service/Dockerfile
+      dockerfile: ./cmd/radio-service/Dockerfile
     volumes: 
-      - "./logs/music-service:/app/logs"
+      - "./logs/radio-service:/app/logs"
     networks:
       - lavalink
   

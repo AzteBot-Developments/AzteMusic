@@ -13,7 +13,7 @@ RUN go mod download
 # Copy rest of source code files
 # TODO: Only copy required files
 COPY . ./
-COPY ./cmd/music-service/.env ./.env
+COPY ./cmd/radio-service/.env ./.env
 
 # Build project
 RUN CGO_ENABLED=0 GOOS=linux go build -o build/main ./internal/bot
