@@ -11,11 +11,13 @@ import (
 // Called once the Discord servers confirm a succesful connection.
 func (b *Bot) onReady(s *discordgo.Session, event *discordgo.Ready) {
 
-	// Safety calls
-	b.SetupLavalink()
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	b.AddLavalinkNode(ctx)
+	// Initial lavalink setup unless it was setup already
+	if !b.HasLavaLinkClient {
+		b.SetupLavalink()
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		b.AddLavalinkNode(ctx)
+	}
 
 	// Any initial setup for the music service !
 	// i.e join designated server, play designated playlist, etc.

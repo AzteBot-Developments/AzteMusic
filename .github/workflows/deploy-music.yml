@@ -50,7 +50,7 @@ jobs:
       - name: Setup environment
         run: |
           : # Environment variables for music services
-          echo ${{ secrets.MUSIC_SERVICE_ENV_BASE64 }} | base64 --decode > cmd/music-service/.env
+          echo ${{ secrets.MUSIC_SERVICE_ENV_BASE64 }} | base64 --decode > cmd/radio-service/.env
 
       - name: Generate SHA output
         id: vars
@@ -75,7 +75,7 @@ jobs:
 
       - name: 'Docker build'
         run: |
-          docker build --tag "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTERADIO_IMAGE }}:${{ steps.vars.outputs.GITHUB_SHA }}" -f cmd/music-service/Dockerfile .
+          docker build --tag "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTERADIO_IMAGE }}:${{ steps.vars.outputs.GITHUB_SHA }}" -f cmd/radio-service/Dockerfile .
 
       - name: 'Docker push'
         run: |
