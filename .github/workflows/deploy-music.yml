@@ -48,9 +48,11 @@ jobs:
           dry_run: true
 
       - name: Setup environment
+        env: 
+          AZTERADIO_SERVICE_CONFIGURATION_BASE64 = ${{ secrets.MUSIC_SERVICE_ENV_BASE64 }}
         run: |
           : # Environment variables for music services
-          echo ${{ secrets.MUSIC_SERVICE_ENV_BASE64 }} | base64 --decode > cmd/radio-service/.env
+          echo ${{ env.AZTERADIO_SERVICE_CONFIGURATION_BASE64 }} | base64 --decode > cmd/radio-service/.env
 
       - name: Generate SHA output
         id: vars
