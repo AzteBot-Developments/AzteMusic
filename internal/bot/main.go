@@ -22,6 +22,8 @@ var (
 	BotAppId = os.Getenv("BOT_APP_ID")
 	GuildId  = os.Getenv("GUILD_ID")
 
+	BotName = os.Getenv("BOT_NAME")
+
 	DesignatedChannelId   = os.Getenv("DESIGNATED_VOICE_CHANNEL_ID")
 	DesignatedPlaylistUrl = os.Getenv("DESIGNATED_PLAYLIST_URL")
 	StatusText            = os.Getenv("STATUS_TEXT")

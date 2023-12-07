@@ -11,6 +11,8 @@ import (
 
 	"github.com/disgoorg/disgolink/v3/disgolink"
 	"github.com/disgoorg/disgolink/v3/lavalink"
+
+	embed "github.com/AzteBot-Developments/AzteMusic/pkg/shared"
 )
 
 func (b *Bot) shuffle(event *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
@@ -88,20 +90,37 @@ func (b *Bot) queue(event *discordgo.InteractionCreate, data discordgo.Applicati
 		return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "No tracks in queue",
+				Content: "There are no songs on this queue.",
 			},
 		})
 	}
 
-	var tracks string
-	for i, track := range queue.Tracks {
-		tracks += fmt.Sprintf("%d. [`%s`](<%s>)\n", i+1, track.Info.Title, *track.Info.URI)
+	// Get current track playing and add to embed
+	currentTrack, player := b.GetCurrentTrack()
+
+	// Build embed response for the queue response
+	embed := embed.NewEmbed().
+		SetTitle(fmt.Sprintf("Queue - %s", BotName)).
+		SetDescription(
+			fmt.Sprintf(
+				"Currently playing %s (%s) at %s / %s.\n\nThere are %d other songs in this queue.\nThe first %d in the queue can be seen below.", currentTrack.Info.Title, *currentTrack.Info.URI, formatPosition(player.Position()), formatPosition(currentTrack.Info.Length), len(queue.Tracks), 10)).
+		SetThumbnail("https://i.postimg.cc/262tK7VW/148c9120-e0f0-4ed5-8965-eaa7c59cc9f2-2.jpg").
+		SetColor(0x00ff00)
+
+	// Build a list of discordgo embed fields out of the songs on the queue
+	for index, track := range queue.Tracks {
+		title := fmt.Sprintf("%d. %s (%s)", index+1, track.Info.Title, *track.Info.URI)
+		text := ""
+		embed.AddField(title, text, false)
 	}
+
+	// Truncate & paginate (TODO)
+	embed.Truncate()
 
 	return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: fmt.Sprintf("Queue `%s`:\n%s", queue.Type, tracks),
+			Embeds: []*discordgo.MessageEmbed{embed.MessageEmbed},
 		},
 	})
 }

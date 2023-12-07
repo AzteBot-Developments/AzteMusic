@@ -11,6 +11,20 @@ import (
 	"github.com/disgoorg/snowflake/v2"
 )
 
+func (b *Bot) GetCurrentTrack() (*lavalink.Track, disgolink.Player) {
+	player := b.Lavalink.ExistingPlayer(snowflake.MustParse(GuildId))
+	if player == nil {
+		return nil, nil
+	}
+
+	track := player.Track()
+	if track == nil {
+		return nil, nil
+	}
+
+	return track, player
+}
+
 // Plays a YT track or playlist from the given source URL.
 func (b *Bot) PlayOnStartupFromUrl(event *discordgo.Ready, url string, repeatCount int) error {
 
@@ -40,7 +54,9 @@ func (b *Bot) PlayOnStartupFromUrl(event *discordgo.Ready, url string, repeatCou
 				toPlay = &playlist.Tracks[0]
 				queue.Add(playlist.Tracks[1:]...)
 				// Repeat the queue `repeatCount` times
-				// TODO
+				for i := 0; i < repeatCount; i++ {
+					queue.Add(playlist.Tracks[0:]...)
+				}
 			} else {
 				queue.Add(playlist.Tracks...)
 			}
