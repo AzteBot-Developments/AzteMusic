@@ -26,7 +26,7 @@ env:
   GKE_ZONE: europe-west2-c # TODO: Try and make this follow the instance zone declared in the infrastructure repo ?
   GKE_REGION: europe-west2 # TODO: Try and make this follow the instance zone declared in the infrastructure repo ?
   CLUSTER_NAME: ${{ secrets.GKE_CLUSTER_NAME }}
-  AZTERADIO_IMAGE: azteradio-service-go
+  AZTERADIO_IMAGE: azteradio-service
 
 jobs:
 
@@ -96,15 +96,15 @@ jobs:
       
       - name: Remove previous deployments
         run: |
-          kubectl delete deployment --ignore-not-found=true azteradio-service-go-${{ steps.tag_version.outputs.previous_tag }}
+          kubectl delete deployment --ignore-not-found=true azteradio-service-${{ steps.tag_version.outputs.previous_tag }}
       
       - name: Create GKE Deployments for new image
         run: |
-          kubectl create deployment azteradio-service-go-${{ steps.tag_version.outputs.new_tag }} --image="${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTERADIO_IMAGE }}:${{ steps.vars.outputs.GITHUB_SHA }}"
+          kubectl create deployment azteradio-service-${{ steps.tag_version.outputs.new_tag }} --image="${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTERADIO_IMAGE }}:${{ steps.vars.outputs.GITHUB_SHA }}"
 
       - name: Scale deployments
         run: |
-          kubectl scale --replicas=1 deployment/azteradio-service-go-${{ steps.tag_version.outputs.new_tag }}
+          kubectl scale --replicas=1 deployment/azteradio-service-${{ steps.tag_version.outputs.new_tag }}
 
       - name: Show created Pods
         run: |
