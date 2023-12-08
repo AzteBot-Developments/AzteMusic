@@ -33,7 +33,7 @@ func (b *Bot) onTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) 
 
 	// in the case of the radio service, we can check here whether the queue is empty
 	// if it is, play form url again
-	if len(queue.Tracks) == 0 {
+	if len(queue.Tracks) == 0 && DesignatedPlaylistUrl != "" && DesignatedChannelId != "" {
 		b.AddToQueueFromSource(DesignatedPlaylistUrl, 10)
 	}
 
@@ -70,5 +70,9 @@ func (b *Bot) onTrackStuck(player disgolink.Player, event lavalink.TrackStuckEve
 }
 
 func (b *Bot) onWebSocketClosed(player disgolink.Player, event lavalink.WebSocketClosedEvent) {
+	fmt.Printf("onWebSocketClosed: %v\n", event)
+}
+
+func (b *Bot) onUnknownEvent(player disgolink.Player, event lavalink.UnknownEvent) {
 	fmt.Printf("onWebSocketClosed: %v\n", event)
 }

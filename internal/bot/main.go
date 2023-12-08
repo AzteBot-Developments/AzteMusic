@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"regexp"
+	"strings"
 	"syscall"
 	"time"
 
@@ -27,6 +28,8 @@ var (
 	DesignatedChannelId   = os.Getenv("DESIGNATED_VOICE_CHANNEL_ID")
 	DesignatedPlaylistUrl = os.Getenv("DESIGNATED_PLAYLIST_URL")
 	StatusText            = os.Getenv("STATUS_TEXT")
+
+	AllowedRoles = strings.Split(os.Getenv("ALLOWED_ROLES"), ",")
 
 	b = NewBot()
 )

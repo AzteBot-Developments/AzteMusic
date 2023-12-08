@@ -46,6 +46,7 @@ func (b *Bot) SetupLavalink() {
 		disgolink.WithListenerFunc(b.onTrackException),
 		disgolink.WithListenerFunc(b.onTrackStuck),
 		disgolink.WithListenerFunc(b.onWebSocketClosed),
+		disgolink.WithListenerFunc(b.onUnknownEvent),
 	)
 	b.HasLavaLinkClient = true
 }
