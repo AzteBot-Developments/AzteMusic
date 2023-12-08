@@ -15,6 +15,10 @@ import (
 	embed "github.com/AzteBot-Developments/AzteMusic/pkg/shared"
 )
 
+func (b *Bot) skip(event *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
+	return nil
+}
+
 func (b *Bot) shuffle(event *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
 	queue := b.Queues.Get(event.GuildID)
 	if queue == nil {

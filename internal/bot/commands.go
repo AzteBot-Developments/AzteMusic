@@ -22,6 +22,10 @@ var commands = []*discordgo.ApplicationCommand{
 		Description: "Pauses the current song",
 	},
 	{
+		Name:        "skip",
+		Description: "Skips the current song",
+	},
+	{
 		Name:        "now-playing",
 		Description: "Shows the current playing song",
 	},
@@ -77,6 +81,7 @@ func (b *Bot) RegisterCommands() {
 	b.Handlers = map[string]func(event *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error{
 		"play":        b.play,
 		"pause":       b.pause,
+		"skip":        b.skip,
 		"now-playing": b.nowPlaying,
 		"stop":        b.stop,
 		"queue":       b.queue,

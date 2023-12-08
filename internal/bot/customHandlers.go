@@ -36,7 +36,7 @@ func (b *Bot) onReady(s *discordgo.Session, event *discordgo.Ready) {
 		// Play designated playlist on loop, FOREVER :')
 		if DesignatedPlaylistUrl != "" {
 			repeatPlaylistCount := 10
-			if err := b.PlayOnStartupFromUrl(event, DesignatedPlaylistUrl, repeatPlaylistCount); err != nil {
+			if err := b.PlayOnStartupFromSource(event, DesignatedPlaylistUrl, repeatPlaylistCount); err != nil {
 				log.Fatalf("Could not play designated playlist (onReady): %v", err)
 			}
 		}

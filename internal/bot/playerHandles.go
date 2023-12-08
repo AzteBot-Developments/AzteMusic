@@ -22,6 +22,7 @@ func (b *Bot) onTrackStart(player disgolink.Player, event lavalink.TrackStartEve
 }
 
 func (b *Bot) onTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) {
+
 	fmt.Printf("onTrackEnd: %v\n", event)
 
 	if !event.Reason.MayStartNext() {
@@ -29,6 +30,13 @@ func (b *Bot) onTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) 
 	}
 
 	queue := b.Queues.Get(event.GuildID().String())
+
+	// in the case of the radio service, we can check here whether the queue is empty
+	// if it is, play form url again
+	if len(queue.Tracks) == 0 {
+		b.AddToQueueFromSource(DesignatedPlaylistUrl, 10)
+	}
+
 	var (
 		nextTrack lavalink.Track
 		ok        bool
