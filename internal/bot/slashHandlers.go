@@ -277,10 +277,18 @@ func (b *Bot) nowPlaying(event *discordgo.InteractionCreate, data discordgo.Appl
 		})
 	}
 
+	// Build embed response for the queue response
+	embed := embed.NewEmbed().
+		SetTitle("Now Playing").
+		SetDescription(
+			fmt.Sprintf("%s (%s).\n%s / %s", track.Info.Title, *track.Info.URI, formatPosition(player.Position()), formatPosition(track.Info.Length))).
+		SetThumbnail("https://i.postimg.cc/262tK7VW/148c9120-e0f0-4ed5-8965-eaa7c59cc9f2-2.jpg").
+		SetColor(000000)
+
 	return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: fmt.Sprintf("Now playing: [`%s`](<%s>)\n\n %s / %s", track.Info.Title, *track.Info.URI, formatPosition(player.Position()), formatPosition(track.Info.Length)),
+			Embeds: []*discordgo.MessageEmbed{embed.MessageEmbed},
 		},
 	})
 }
