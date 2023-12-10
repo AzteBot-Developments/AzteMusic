@@ -29,7 +29,8 @@ var (
 	DesignatedPlaylistUrl = os.Getenv("DESIGNATED_PLAYLIST_URL")
 	StatusText            = os.Getenv("STATUS_TEXT")
 
-	AllowedRoles = strings.Split(os.Getenv("ALLOWED_ROLES"), ",")
+	RestrictedCommands = strings.Split(os.Getenv("RESTRICTED_COMMANDS"), ",")
+	AllowedRoles       = strings.Split(os.Getenv("ALLOWED_ROLES"), ",")
 
 	b = NewBot()
 )

@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"github.com/AzteBot-Developments/AzteMusic/pkg/shared"
 	"github.com/bwmarrin/discordgo"
 	"github.com/disgoorg/snowflake/v2"
 )
@@ -33,8 +34,8 @@ func (b *Bot) onApplicationCommand(session *discordgo.Session, event *discordgo.
 	data := event.ApplicationCommandData()
 
 	// If allowed roles are configured, only allow a user with one of these roles to execute an app command
-	// Check if the interaction is a slash command
-	if len(AllowedRoles) != 0 {
+	// The app commands which require role permissions are defined here
+	if shared.StringInSlice(data.Name, RestrictedCommands) && len(AllowedRoles) > 0 {
 		if event.Type == discordgo.InteractionApplicationCommand {
 			// Check if the user has the allowed role
 			hasAllowedRole := false
