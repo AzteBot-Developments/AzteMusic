@@ -13,3 +13,4 @@ internal/lavalink/application.prod.yml
 .prod.env
 application.prod.yml.out
 .prod.env.out
+_backups/
