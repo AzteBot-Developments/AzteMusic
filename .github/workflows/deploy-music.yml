@@ -28,6 +28,7 @@ env:
   CLUSTER_NAME: ${{ secrets.GKE_CLUSTER_NAME }}
   AZTERADIO_IMAGE: azteradio-service
   AZTEMUSIC_IMAGE_1: aztemusic-service-1
+  AZTEMUSIC_IMAGE_2: aztemusic-service-2
 
 jobs:
 
@@ -52,10 +53,12 @@ jobs:
         env: 
           AZTERADIO_CONFIG_BASE64: ${{ secrets.AZTERADIO_SERVICE_CONFIGURATION_BASE64 }}
           AZTEMUSIC_1_CONFIG_BASE64: ${{ secrets.AZTEMUSIC_SERVICE_1_CONFIGURATION_BASE64 }}
+          AZTEMUSIC_2_CONFIG_BASE64: ${{ secrets.AZTEMUSIC_SERVICE_2_CONFIGURATION_BASE64 }}
         run: |
           : # Environment variables for all the music services
           echo ${{ env.AZTERADIO_CONFIG_BASE64 }} | base64 --decode > cmd/radio-service/.env
           echo ${{ env.AZTEMUSIC_1_CONFIG_BASE64 }} | base64 --decode > cmd/music-service/1/.env
+          echo ${{ env.AZTEMUSIC_2_CONFIG_BASE64 }} | base64 --decode > cmd/music-service/2/.env
 
       - name: Generate SHA output
         id: vars
@@ -85,11 +88,14 @@ jobs:
 
           : # Build music services
           docker build --tag "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTEMUSIC_IMAGE_1 }}:${{ steps.vars.outputs.GITHUB_SHA }}" -f cmd/music-service/1/Dockerfile .
+          docker build --tag "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTEMUSIC_IMAGE_2 }}:${{ steps.vars.outputs.GITHUB_SHA }}" -f cmd/music-service/2/Dockerfile .
 
       - name: 'Docker push'
         run: |
           docker push "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTERADIO_IMAGE }}:${{ steps.vars.outputs.GITHUB_SHA }}"
-          docker push "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTEMUSIC_IMAGE_1 }}:${{ steps.vars.outputs.GITHUB_SHA }}"
+
+          docker push "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTEMUSIC_IMAGE_2 }}:${{ steps.vars.outputs.GITHUB_SHA }}"
+          docker push "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTEMUSIC_IMAGE_2 }}:${{ steps.vars.outputs.GITHUB_SHA }}"
       
       - name: Connect to GKE
         uses: google-github-actions/get-gke-credentials@v2.0.0
@@ -105,17 +111,23 @@ jobs:
       - name: Remove previous deployments
         run: |
           kubectl delete deployment --ignore-not-found=true azteradio-service-${{ steps.tag_version.outputs.previous_tag }}
+
           kubectl delete deployment --ignore-not-found=true aztemusic-service-1-${{ steps.tag_version.outputs.previous_tag }}
+          kubectl delete deployment --ignore-not-found=true aztemusic-service-2-${{ steps.tag_version.outputs.previous_tag }}
       
       - name: Create GKE Deployments for new image
         run: |
           kubectl create deployment azteradio-service-${{ steps.tag_version.outputs.new_tag }} --image="${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTERADIO_IMAGE }}:${{ steps.vars.outputs.GITHUB_SHA }}"
+
           kubectl create deployment aztemusic-service-1-${{ steps.tag_version.outputs.new_tag }} --image="${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTEMUSIC_IMAGE_1 }}:${{ steps.vars.outputs.GITHUB_SHA }}"
+          kubectl create deployment aztemusic-service-2-${{ steps.tag_version.outputs.new_tag }} --image="${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTEMUSIC_IMAGE_2 }}:${{ steps.vars.outputs.GITHUB_SHA }}"
 
       - name: Scale deployments
         run: |
           kubectl scale --replicas=1 deployment/azteradio-service-${{ steps.tag_version.outputs.new_tag }}
+
           kubectl scale --replicas=1 deployment/aztemusic-service-1-${{ steps.tag_version.outputs.new_tag }}
+          kubectl scale --replicas=1 deployment/aztemusic-service-2-${{ steps.tag_version.outputs.new_tag }}
 
       - name: Show created Pods
         run: |

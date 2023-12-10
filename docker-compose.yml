@@ -31,6 +31,17 @@ services:
       - "./logs/music-service/1:/app/logs"
     networks:
       - lavalink
+
+  aztemusic-2:
+    container_name: music-service-2
+    env_file:
+      ./cmd/music-service/2/.env
+    build:
+      dockerfile: ./cmd/music-service/2/Dockerfile
+    volumes: 
+      - "./logs/music-service/2:/app/logs"
+    networks:
+      - lavalink
   
 
 networks:
