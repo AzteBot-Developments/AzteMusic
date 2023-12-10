@@ -429,7 +429,7 @@ func (b *Bot) play(event *discordgo.InteractionCreate, data discordgo.Applicatio
 func (b *Bot) help(event *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
 
 	embed := shared.NewEmbed().
-		SetTitle(fmt.Sprintf("🎵  %s Slash Commands Guide", BotName)).
+		SetTitle(fmt.Sprintf("🎵  `%s` Slash Commands Guide", BotName)).
 		SetDescription(fmt.Sprintf("See below the available slash commands for `%s`.", BotName)).
 		SetThumbnail("https://i.postimg.cc/262tK7VW/148c9120-e0f0-4ed5-8965-eaa7c59cc9f2-2.jpg").
 		SetColor(000000)
@@ -438,7 +438,7 @@ func (b *Bot) help(event *discordgo.InteractionCreate, data discordgo.Applicatio
 	for _, command := range Commands {
 
 		text := command.Description
-		title := command.Name
+		title := fmt.Sprintf("`/%s`", command.Name)
 
 		if len(command.Options) > 0 {
 			for _, param := range command.Options {
@@ -448,7 +448,7 @@ func (b *Bot) help(event *discordgo.InteractionCreate, data discordgo.Applicatio
 				} else {
 					required = "optional"
 				}
-				title += fmt.Sprintf(" [%s (%s) - %s]", param.Name, required, param.Description)
+				title += fmt.Sprintf(" `[%s (%s) - %s]`", param.Name, required, param.Description)
 			}
 		}
 
