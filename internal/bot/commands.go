@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/bwmarrin/discordgo"
 )
 
-var commands = []*discordgo.ApplicationCommand{
+var Commands = []*discordgo.ApplicationCommand{
 	{
 		Name:        "play",
 		Description: "Plays a song",
@@ -24,6 +26,10 @@ var commands = []*discordgo.ApplicationCommand{
 	{
 		Name:        "skip",
 		Description: "Skips the current song",
+	},
+	{
+		Name:        "help",
+		Description: fmt.Sprintf("Returns a slash commands guide for the %s", BotName),
 	},
 	{
 		Name:        "now-playing",
@@ -84,9 +90,10 @@ func (b *Bot) RegisterCommands() {
 		"clear-queue": b.clearQueue,
 		"queue-type":  b.queueType,
 		"shuffle":     b.shuffle,
+		"help":        b.help,
 	}
 
-	if _, err := b.Session.ApplicationCommandBulkOverwrite(b.Session.State.User.ID, GuildId, commands); err != nil {
+	if _, err := b.Session.ApplicationCommandBulkOverwrite(b.Session.State.User.ID, GuildId, Commands); err != nil {
 		panic(err)
 	}
 }

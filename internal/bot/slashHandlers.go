@@ -383,3 +383,40 @@ func (b *Bot) play(event *discordgo.InteractionCreate, data discordgo.Applicatio
 
 	return player.Update(context.TODO(), lavalink.WithTrack(*toPlay))
 }
+
+func (b *Bot) help(event *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
+	// Build embed response for the queue response
+	embed := embed.NewEmbed().
+		SetTitle(fmt.Sprintf("🎵 %s Slash Commands Guide", BotName)).
+		SetDescription(fmt.Sprintf("See below the available slash commands for %s.", BotName)).
+		SetThumbnail("https://i.postimg.cc/262tK7VW/148c9120-e0f0-4ed5-8965-eaa7c59cc9f2-2.jpg").
+		SetColor(000000)
+
+	// Build a list of discordgo embed fields out of the available slash commands
+	for _, command := range Commands {
+
+		text := command.Description
+		title := command.Name
+
+		if len(command.Options) > 0 {
+			for _, param := range command.Options {
+				var required string
+				if param.Required {
+					required = "required"
+				} else {
+					required = "optional"
+				}
+				title += fmt.Sprintf(" [%s - %s]", param.Name, required)
+			}
+		}
+
+		embed.AddField(title, text, false)
+	}
+
+	return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Embeds: []*discordgo.MessageEmbed{embed.MessageEmbed},
+		},
+	})
+}
