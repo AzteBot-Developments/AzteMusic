@@ -385,7 +385,7 @@ func (b *Bot) play(event *discordgo.InteractionCreate, data discordgo.Applicatio
 }
 
 func (b *Bot) help(event *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
-	// Build embed response for the queue response
+
 	embed := embed.NewEmbed().
 		SetTitle(fmt.Sprintf("🎵 %s Slash Commands Guide", BotName)).
 		SetDescription(fmt.Sprintf("See below the available slash commands for %s.", BotName)).
@@ -406,7 +406,7 @@ func (b *Bot) help(event *discordgo.InteractionCreate, data discordgo.Applicatio
 				} else {
 					required = "optional"
 				}
-				title += fmt.Sprintf(" [%s - %s]", param.Name, required)
+				title += fmt.Sprintf(" [%s (%s) - %s]", param.Name, required, param.Description)
 			}
 		}
 
