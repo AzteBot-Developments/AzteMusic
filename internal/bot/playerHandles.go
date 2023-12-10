@@ -54,6 +54,10 @@ func (b *Bot) onTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) 
 	}
 
 	if !ok {
+		// No tracks on the queue, or could not play next, so can safely disconnect from the VC to save resources.
+		if err := b.Session.ChannelVoiceJoinManual(GuildId, "", false, false); err != nil {
+			fmt.Printf("[onTrackEnd] Error ocurred when disconnecting from VC: %v", err)
+		}
 		return
 	}
 	if err := player.Update(context.TODO(), lavalink.WithTrack(nextTrack)); err != nil {
