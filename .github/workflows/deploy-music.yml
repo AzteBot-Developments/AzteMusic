@@ -29,7 +29,7 @@ env:
   AZTERADIO_IMAGE: azteradio-service
   AZTEMUSIC_IMAGE_1: aztemusic-service-1
   AZTEMUSIC_IMAGE_2: aztemusic-service-2
-  AZTEMUSIC_IMAGE_2: aztemusic-service-3
+  AZTEMUSIC_IMAGE_3: aztemusic-service-3
 
 jobs:
 
