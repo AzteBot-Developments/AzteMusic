@@ -71,7 +71,7 @@ func (b *Bot) skip(event *discordgo.InteractionCreate, data discordgo.Applicatio
 	embed := shared.NewEmbed().
 		SetTitle("🎵  Now Playing").
 		SetDescription(
-			fmt.Sprintf("%s (%s).", nextTrack.Info.Title, *nextTrack.Info.URI)).
+			fmt.Sprintf("`%s` (%s).", nextTrack.Info.Title, *nextTrack.Info.URI)).
 		SetThumbnail(*nextTrack.Info.ArtworkURL).
 		SetColor(000000)
 
@@ -165,7 +165,10 @@ func (b *Bot) queue(event *discordgo.InteractionCreate, data discordgo.Applicati
 	}
 
 	// Calculate the total length in time of the playlist
-	// TODO
+	var totalDurationSec int64
+	for _, track := range queue.Tracks {
+		totalDurationSec += track.Info.Length.Seconds()
+	}
 
 	// Get current track playing and add to embed
 	currentTrack, player := b.GetCurrentTrack()
@@ -175,13 +178,13 @@ func (b *Bot) queue(event *discordgo.InteractionCreate, data discordgo.Applicati
 		SetTitle(fmt.Sprintf("🎵  Queue - %s", BotName)).
 		SetDescription(
 			fmt.Sprintf(
-				"Currently playing %s (%s) at %s / %s.\n\nThere are %d other songs in this queue.\nThe first %d in the queue can be seen below.", currentTrack.Info.Title, *currentTrack.Info.URI, formatPosition(player.Position()), formatPosition(currentTrack.Info.Length), len(queue.Tracks), 10)).
+				"Currently playing `%s` (%s) at %s / %s.\n\nQueue Duration: %s\nThere are %d other songs in this queue.\nThe first %d tracks in the queue can be seen below.", currentTrack.Info.Title, *currentTrack.Info.URI, formatPosition(player.Position()), formatPosition(currentTrack.Info.Length), shared.FormatDuration(totalDurationSec), len(queue.Tracks), 10)).
 		SetThumbnail(*currentTrack.Info.ArtworkURL).
 		SetColor(000000)
 
 	// Build a list of discordgo embed fields out of the songs on the queue
 	for index, track := range queue.Tracks {
-		title := fmt.Sprintf("%d. %s (%s)", index+1, track.Info.Title, *track.Info.URI)
+		title := fmt.Sprintf("%d. `%s` (%s)", index+1, track.Info.Title, *track.Info.URI)
 		text := ""
 		embed.AddField(title, text, false)
 	}
@@ -282,7 +285,7 @@ func (b *Bot) nowPlaying(event *discordgo.InteractionCreate, data discordgo.Appl
 	embed := shared.NewEmbed().
 		SetTitle("🎵  Now Playing").
 		SetDescription(
-			fmt.Sprintf("%s (%s).\n%s / %s", track.Info.Title, *track.Info.URI, formatPosition(player.Position()), formatPosition(track.Info.Length))).
+			fmt.Sprintf("`%s` (%s).\n%s / %s", track.Info.Title, *track.Info.URI, formatPosition(player.Position()), formatPosition(track.Info.Length))).
 		SetThumbnail(*track.Info.ArtworkURL).
 		SetColor(000000)
 
@@ -336,7 +339,7 @@ func (b *Bot) play(event *discordgo.InteractionCreate, data discordgo.Applicatio
 			embed := shared.NewEmbed().
 				SetTitle("🎵  Loading Track").
 				SetDescription(
-					fmt.Sprintf("%s (%s).\nTrack Duration: %s", track.Info.Title, *track.Info.URI, formatPosition(track.Info.Length))).
+					fmt.Sprintf("`%s` (%s).\nTrack Duration: %s", track.Info.Title, *track.Info.URI, formatPosition(track.Info.Length))).
 				SetThumbnail(*track.Info.ArtworkURL).
 				SetColor(000000)
 
@@ -363,7 +366,7 @@ func (b *Bot) play(event *discordgo.InteractionCreate, data discordgo.Applicatio
 			embed := shared.NewEmbed().
 				SetTitle(fmt.Sprintf("🎵  Loading Playlist `%s` with `%d` tracks", playlist.Info.Name, len(playlist.Tracks))).
 				SetDescription(
-					fmt.Sprintf("Playlist Duration: %s.\nFirst track in playlist: %s (%s)", shared.FormatDuration(totalDurationSec), playlist.Tracks[0].Info.Title, *playlist.Tracks[0].Info.URI)).
+					fmt.Sprintf("Playlist Duration: %s.\nFirst track in playlist: `%s` (%s)", shared.FormatDuration(totalDurationSec), playlist.Tracks[0].Info.Title, *playlist.Tracks[0].Info.URI)).
 				SetThumbnail(*playlist.Tracks[0].Info.ArtworkURL).
 				SetColor(000000)
 
@@ -385,7 +388,7 @@ func (b *Bot) play(event *discordgo.InteractionCreate, data discordgo.Applicatio
 			embed := shared.NewEmbed().
 				SetTitle("🎵  Loading Track").
 				SetDescription(
-					fmt.Sprintf("%s (%s).\nTrack Duration: %s", tracks[0].Info.Title, *tracks[0].Info.URI, formatPosition(tracks[0].Info.Length))).
+					fmt.Sprintf("`%s` (%s).\nTrack Duration: %s", tracks[0].Info.Title, *tracks[0].Info.URI, formatPosition(tracks[0].Info.Length))).
 				SetThumbnail(*tracks[0].Info.ArtworkURL).
 				SetColor(000000)
 
@@ -427,7 +430,7 @@ func (b *Bot) help(event *discordgo.InteractionCreate, data discordgo.Applicatio
 
 	embed := shared.NewEmbed().
 		SetTitle(fmt.Sprintf("🎵  %s Slash Commands Guide", BotName)).
-		SetDescription(fmt.Sprintf("See below the available slash commands for %s.", BotName)).
+		SetDescription(fmt.Sprintf("See below the available slash commands for `%s`.", BotName)).
 		SetThumbnail("https://i.postimg.cc/262tK7VW/148c9120-e0f0-4ed5-8965-eaa7c59cc9f2-2.jpg").
 		SetColor(000000)
 
