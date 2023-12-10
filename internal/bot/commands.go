@@ -34,10 +34,6 @@ var commands = []*discordgo.ApplicationCommand{
 		Description: "Stops the current song and stops the player",
 	},
 	{
-		Name:        "players",
-		Description: "Shows all active players",
-	},
-	{
 		Name:        "shuffle",
 		Description: "Shuffles the current queue",
 	},

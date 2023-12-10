@@ -68,12 +68,11 @@ func (b *Bot) skip(event *discordgo.InteractionCreate, data discordgo.Applicatio
 		})
 	}
 
-	// Build embed response for the queue response
 	embed := embed.NewEmbed().
-		SetTitle("Now Playing").
+		SetTitle("🎵 Now Playing").
 		SetDescription(
 			fmt.Sprintf("%s (%s).", nextTrack.Info.Title, *nextTrack.Info.URI)).
-		SetThumbnail("https://i.postimg.cc/262tK7VW/148c9120-e0f0-4ed5-8965-eaa7c59cc9f2-2.jpg").
+		SetThumbnail(*nextTrack.Info.ArtworkURL).
 		SetColor(000000)
 
 	return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
@@ -165,16 +164,19 @@ func (b *Bot) queue(event *discordgo.InteractionCreate, data discordgo.Applicati
 		})
 	}
 
+	// Calculate the total length in time of the playlist
+	// TODO
+
 	// Get current track playing and add to embed
 	currentTrack, player := b.GetCurrentTrack()
 
 	// Build embed response for the queue response
 	embed := embed.NewEmbed().
-		SetTitle(fmt.Sprintf("Queue - %s", BotName)).
+		SetTitle(fmt.Sprintf("🎵 Queue - %s", BotName)).
 		SetDescription(
 			fmt.Sprintf(
 				"Currently playing %s (%s) at %s / %s.\n\nThere are %d other songs in this queue.\nThe first %d in the queue can be seen below.", currentTrack.Info.Title, *currentTrack.Info.URI, formatPosition(player.Position()), formatPosition(currentTrack.Info.Length), len(queue.Tracks), 10)).
-		SetThumbnail("https://i.postimg.cc/262tK7VW/148c9120-e0f0-4ed5-8965-eaa7c59cc9f2-2.jpg").
+		SetThumbnail(*currentTrack.Info.ArtworkURL).
 		SetColor(000000)
 
 	// Build a list of discordgo embed fields out of the songs on the queue
@@ -277,12 +279,11 @@ func (b *Bot) nowPlaying(event *discordgo.InteractionCreate, data discordgo.Appl
 		})
 	}
 
-	// Build embed response for the queue response
 	embed := embed.NewEmbed().
-		SetTitle("Now Playing").
+		SetTitle("🎵 Now Playing").
 		SetDescription(
 			fmt.Sprintf("%s (%s).\n%s / %s", track.Info.Title, *track.Info.URI, formatPosition(player.Position()), formatPosition(track.Info.Length))).
-		SetThumbnail("https://i.postimg.cc/262tK7VW/148c9120-e0f0-4ed5-8965-eaa7c59cc9f2-2.jpg").
+		SetThumbnail(*track.Info.ArtworkURL).
 		SetColor(000000)
 
 	return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{

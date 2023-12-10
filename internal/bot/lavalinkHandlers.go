@@ -45,11 +45,8 @@ func (b *Bot) onApplicationCommand(session *discordgo.Session, event *discordgo.
 					log.Println("Error getting role:", err)
 					return
 				}
-				for _, role := range AllowedRoles {
-					if roleObj.Name == role {
-						hasAllowedRole = true
-						break
-					}
+				if shared.StringInSlice(roleObj.Name, AllowedRoles) {
+					hasAllowedRole = true
 				}
 				if hasAllowedRole {
 					break
