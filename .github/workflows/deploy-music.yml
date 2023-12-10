@@ -94,7 +94,7 @@ jobs:
         run: |
           docker push "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTERADIO_IMAGE }}:${{ steps.vars.outputs.GITHUB_SHA }}"
 
-          docker push "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTEMUSIC_IMAGE_2 }}:${{ steps.vars.outputs.GITHUB_SHA }}"
+          docker push "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTEMUSIC_IMAGE_1 }}:${{ steps.vars.outputs.GITHUB_SHA }}"
           docker push "${{ env.GKE_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.DOCKER_ARTIFACT_REPOSITORY }}/${{ env.AZTEMUSIC_IMAGE_2 }}:${{ steps.vars.outputs.GITHUB_SHA }}"
       
       - name: Connect to GKE
