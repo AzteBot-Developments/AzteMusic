@@ -12,7 +12,7 @@ import (
 	"github.com/disgoorg/disgolink/v3/disgolink"
 	"github.com/disgoorg/disgolink/v3/lavalink"
 
-	embed "github.com/AzteBot-Developments/AzteMusic/pkg/shared"
+	"github.com/AzteBot-Developments/AzteMusic/pkg/shared"
 )
 
 func (b *Bot) skip(event *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
@@ -68,8 +68,8 @@ func (b *Bot) skip(event *discordgo.InteractionCreate, data discordgo.Applicatio
 		})
 	}
 
-	embed := embed.NewEmbed().
-		SetTitle("🎵 Now Playing").
+	embed := shared.NewEmbed().
+		SetTitle("🎵  Now Playing").
 		SetDescription(
 			fmt.Sprintf("%s (%s).", nextTrack.Info.Title, *nextTrack.Info.URI)).
 		SetThumbnail(*nextTrack.Info.ArtworkURL).
@@ -171,8 +171,8 @@ func (b *Bot) queue(event *discordgo.InteractionCreate, data discordgo.Applicati
 	currentTrack, player := b.GetCurrentTrack()
 
 	// Build embed response for the queue response
-	embed := embed.NewEmbed().
-		SetTitle(fmt.Sprintf("🎵 Queue - %s", BotName)).
+	embed := shared.NewEmbed().
+		SetTitle(fmt.Sprintf("🎵  Queue - %s", BotName)).
 		SetDescription(
 			fmt.Sprintf(
 				"Currently playing %s (%s) at %s / %s.\n\nThere are %d other songs in this queue.\nThe first %d in the queue can be seen below.", currentTrack.Info.Title, *currentTrack.Info.URI, formatPosition(player.Position()), formatPosition(currentTrack.Info.Length), len(queue.Tracks), 10)).
@@ -186,7 +186,7 @@ func (b *Bot) queue(event *discordgo.InteractionCreate, data discordgo.Applicati
 		embed.AddField(title, text, false)
 	}
 
-	// Truncate & paginate (TODO)
+	// Truncate & paginate
 	embed.Truncate()
 
 	return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
@@ -279,8 +279,8 @@ func (b *Bot) nowPlaying(event *discordgo.InteractionCreate, data discordgo.Appl
 		})
 	}
 
-	embed := embed.NewEmbed().
-		SetTitle("🎵 Now Playing").
+	embed := shared.NewEmbed().
+		SetTitle("🎵  Now Playing").
 		SetDescription(
 			fmt.Sprintf("%s (%s).\n%s / %s", track.Info.Title, *track.Info.URI, formatPosition(player.Position()), formatPosition(track.Info.Length))).
 		SetThumbnail(*track.Info.ArtworkURL).
@@ -332,9 +332,20 @@ func (b *Bot) play(event *discordgo.InteractionCreate, data discordgo.Applicatio
 	var toPlay *lavalink.Track
 	b.Lavalink.BestNode().LoadTracksHandler(ctx, identifier, disgolink.NewResultHandler(
 		func(track lavalink.Track) {
+			// Embed build
+			embed := shared.NewEmbed().
+				SetTitle("🎵  Loading Track").
+				SetDescription(
+					fmt.Sprintf("%s (%s).\nTrack Duration: %s", track.Info.Title, *track.Info.URI, formatPosition(track.Info.Length))).
+				SetThumbnail(*track.Info.ArtworkURL).
+				SetColor(000000)
+
+			// Interaction response
 			_, _ = b.Session.InteractionResponseEdit(event.Interaction, &discordgo.WebhookEdit{
-				Content: json.Ptr(fmt.Sprintf("Loading track: [`%s`](<%s>)", track.Info.Title, *track.Info.URI)),
+				Embeds: &[]*discordgo.MessageEmbed{embed.MessageEmbed},
 			})
+
+			// Queue handling
 			if player.Track() == nil {
 				toPlay = &track
 			} else {
@@ -342,9 +353,26 @@ func (b *Bot) play(event *discordgo.InteractionCreate, data discordgo.Applicatio
 			}
 		},
 		func(playlist lavalink.Playlist) {
+			// Calculate total length of loaded playlist
+			var totalDurationSec int64
+			for _, track := range playlist.Tracks {
+				totalDurationSec += track.Info.Length.Seconds()
+			}
+
+			// Embed build
+			embed := shared.NewEmbed().
+				SetTitle(fmt.Sprintf("🎵  Loading Playlist `%s` with `%d` tracks", playlist.Info.Name, len(playlist.Tracks))).
+				SetDescription(
+					fmt.Sprintf("Playlist Duration: %s.\nFirst track in playlist: %s (%s)", shared.FormatDuration(totalDurationSec), playlist.Tracks[0].Info.Title, *playlist.Tracks[0].Info.URI)).
+				SetThumbnail(*playlist.Tracks[0].Info.ArtworkURL).
+				SetColor(000000)
+
+			// Interaction response
 			_, _ = b.Session.InteractionResponseEdit(event.Interaction, &discordgo.WebhookEdit{
-				Content: json.Ptr(fmt.Sprintf("Loaded playlist: `%s` with `%d` tracks.", playlist.Info.Name, len(playlist.Tracks))),
+				Embeds: &[]*discordgo.MessageEmbed{embed.MessageEmbed},
 			})
+
+			// Queue handling
 			if player.Track() == nil {
 				toPlay = &playlist.Tracks[0]
 				queue.Add(playlist.Tracks[1:]...)
@@ -353,9 +381,20 @@ func (b *Bot) play(event *discordgo.InteractionCreate, data discordgo.Applicatio
 			}
 		},
 		func(tracks []lavalink.Track) {
+			// Embed build
+			embed := shared.NewEmbed().
+				SetTitle("🎵  Loading Track").
+				SetDescription(
+					fmt.Sprintf("%s (%s).\nTrack Duration: %s", tracks[0].Info.Title, *tracks[0].Info.URI, formatPosition(tracks[0].Info.Length))).
+				SetThumbnail(*tracks[0].Info.ArtworkURL).
+				SetColor(000000)
+
+			// Interaction response
 			_, _ = b.Session.InteractionResponseEdit(event.Interaction, &discordgo.WebhookEdit{
-				Content: json.Ptr(fmt.Sprintf("Loaded search result: [`%s`](<%s>).", tracks[0].Info.Title, *tracks[0].Info.URI)),
+				Embeds: &[]*discordgo.MessageEmbed{embed.MessageEmbed},
 			})
+
+			// Queue handling
 			if player.Track() == nil {
 				toPlay = &tracks[0]
 			} else {
@@ -386,8 +425,8 @@ func (b *Bot) play(event *discordgo.InteractionCreate, data discordgo.Applicatio
 
 func (b *Bot) help(event *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
 
-	embed := embed.NewEmbed().
-		SetTitle(fmt.Sprintf("🎵 %s Slash Commands Guide", BotName)).
+	embed := shared.NewEmbed().
+		SetTitle(fmt.Sprintf("🎵  %s Slash Commands Guide", BotName)).
 		SetDescription(fmt.Sprintf("See below the available slash commands for %s.", BotName)).
 		SetThumbnail("https://i.postimg.cc/262tK7VW/148c9120-e0f0-4ed5-8965-eaa7c59cc9f2-2.jpg").
 		SetColor(000000)

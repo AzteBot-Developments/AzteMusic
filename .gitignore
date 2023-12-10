@@ -29,4 +29,4 @@ application.yml
 logs/
 application.prod.yml.out
 .prod.env.out
-_backups/
+__backups/
