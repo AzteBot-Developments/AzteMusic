@@ -16,7 +16,73 @@ import (
 )
 
 func (b *Bot) skip(event *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
-	return nil
+
+	player := b.Lavalink.ExistingPlayer(snowflake.MustParse(event.GuildID))
+	if player == nil {
+		return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "No player found.",
+			},
+		})
+	}
+
+	queue := b.Queues.Get(event.GuildID)
+	if queue == nil {
+		return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "No queue available.",
+			},
+		})
+	}
+
+	if len(queue.Tracks) == 0 {
+		return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "There is no song to skip to.",
+			},
+		})
+	}
+
+	// Get next song on queue
+	nextTrack, ok := queue.Next()
+	if !ok {
+		return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "An error ocurred while retrieving the next song from the queue.",
+			},
+		})
+	}
+
+	// Play immediately
+	err := player.Update(context.TODO(), lavalink.WithTrack(nextTrack))
+	if err != nil {
+		return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "An error ocurred while skipping the current track.",
+			},
+		})
+	}
+
+	// Build embed response for the queue response
+	embed := embed.NewEmbed().
+		SetTitle("Now Playing").
+		SetDescription(
+			fmt.Sprintf("%s (%s).", nextTrack.Info.Title, *nextTrack.Info.URI)).
+		SetThumbnail("https://i.postimg.cc/262tK7VW/148c9120-e0f0-4ed5-8965-eaa7c59cc9f2-2.jpg").
+		SetColor(000000)
+
+	return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Embeds: []*discordgo.MessageEmbed{embed.MessageEmbed},
+		},
+	})
+
 }
 
 func (b *Bot) shuffle(event *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
@@ -25,7 +91,7 @@ func (b *Bot) shuffle(event *discordgo.InteractionCreate, data discordgo.Applica
 		return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "No player found",
+				Content: "No player found.",
 			},
 		})
 	}
@@ -34,7 +100,7 @@ func (b *Bot) shuffle(event *discordgo.InteractionCreate, data discordgo.Applica
 	return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: "Queue shuffled",
+			Content: "Queue shuffled.",
 		},
 	})
 }
@@ -45,7 +111,7 @@ func (b *Bot) queueType(event *discordgo.InteractionCreate, data discordgo.Appli
 		return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "No player found",
+				Content: "No player found.",
 			},
 		})
 	}
@@ -54,7 +120,7 @@ func (b *Bot) queueType(event *discordgo.InteractionCreate, data discordgo.Appli
 	return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: fmt.Sprintf("Queue type set to `%s`", queue.Type),
+			Content: fmt.Sprintf("Queue type set to `%s`.", queue.Type),
 		},
 	})
 }
@@ -65,7 +131,7 @@ func (b *Bot) clearQueue(event *discordgo.InteractionCreate, data discordgo.Appl
 		return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "No player found",
+				Content: "No player found.",
 			},
 		})
 	}
@@ -74,7 +140,7 @@ func (b *Bot) clearQueue(event *discordgo.InteractionCreate, data discordgo.Appl
 	return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: "Queue cleared",
+			Content: "Queue cleared.",
 		},
 	})
 }
@@ -85,7 +151,7 @@ func (b *Bot) queue(event *discordgo.InteractionCreate, data discordgo.Applicati
 		return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "No player found",
+				Content: "No player found.",
 			},
 		})
 	}
@@ -109,7 +175,7 @@ func (b *Bot) queue(event *discordgo.InteractionCreate, data discordgo.Applicati
 			fmt.Sprintf(
 				"Currently playing %s (%s) at %s / %s.\n\nThere are %d other songs in this queue.\nThe first %d in the queue can be seen below.", currentTrack.Info.Title, *currentTrack.Info.URI, formatPosition(player.Position()), formatPosition(currentTrack.Info.Length), len(queue.Tracks), 10)).
 		SetThumbnail("https://i.postimg.cc/262tK7VW/148c9120-e0f0-4ed5-8965-eaa7c59cc9f2-2.jpg").
-		SetColor(0x00ff00)
+		SetColor(000000)
 
 	// Build a list of discordgo embed fields out of the songs on the queue
 	for index, track := range queue.Tracks {
@@ -135,7 +201,7 @@ func (b *Bot) pause(event *discordgo.InteractionCreate, data discordgo.Applicati
 		return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "No player found",
+				Content: "No player found.",
 			},
 		})
 	}
@@ -157,7 +223,7 @@ func (b *Bot) pause(event *discordgo.InteractionCreate, data discordgo.Applicati
 	return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: fmt.Sprintf("Player is now %s", status),
+			Content: fmt.Sprintf("Player is now %s.", status),
 		},
 	})
 }
@@ -168,7 +234,7 @@ func (b *Bot) stop(event *discordgo.InteractionCreate, data discordgo.Applicatio
 		return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "No player found",
+				Content: "No player found.",
 			},
 		})
 	}
@@ -177,7 +243,7 @@ func (b *Bot) stop(event *discordgo.InteractionCreate, data discordgo.Applicatio
 		return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: fmt.Sprintf("Error while disconnecting: `%s`", err),
+				Content: fmt.Sprintf("Error while disconnecting: `%s`.", err),
 			},
 		})
 	}
@@ -185,7 +251,7 @@ func (b *Bot) stop(event *discordgo.InteractionCreate, data discordgo.Applicatio
 	return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: "Player stopped",
+			Content: "Player stopped.",
 		},
 	})
 }
@@ -196,7 +262,7 @@ func (b *Bot) nowPlaying(event *discordgo.InteractionCreate, data discordgo.Appl
 		return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "No player found",
+				Content: "No player found.",
 			},
 		})
 	}
@@ -206,7 +272,7 @@ func (b *Bot) nowPlaying(event *discordgo.InteractionCreate, data discordgo.Appl
 		return b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "No track found",
+				Content: "No track found.",
 			},
 		})
 	}
@@ -268,7 +334,7 @@ func (b *Bot) play(event *discordgo.InteractionCreate, data discordgo.Applicatio
 		},
 		func(playlist lavalink.Playlist) {
 			_, _ = b.Session.InteractionResponseEdit(event.Interaction, &discordgo.WebhookEdit{
-				Content: json.Ptr(fmt.Sprintf("Loaded playlist: `%s` with `%d` tracks", playlist.Info.Name, len(playlist.Tracks))),
+				Content: json.Ptr(fmt.Sprintf("Loaded playlist: `%s` with `%d` tracks.", playlist.Info.Name, len(playlist.Tracks))),
 			})
 			if player.Track() == nil {
 				toPlay = &playlist.Tracks[0]
@@ -279,7 +345,7 @@ func (b *Bot) play(event *discordgo.InteractionCreate, data discordgo.Applicatio
 		},
 		func(tracks []lavalink.Track) {
 			_, _ = b.Session.InteractionResponseEdit(event.Interaction, &discordgo.WebhookEdit{
-				Content: json.Ptr(fmt.Sprintf("Loaded search result: [`%s`](<%s>)", tracks[0].Info.Title, *tracks[0].Info.URI)),
+				Content: json.Ptr(fmt.Sprintf("Loaded search result: [`%s`](<%s>).", tracks[0].Info.Title, *tracks[0].Info.URI)),
 			})
 			if player.Track() == nil {
 				toPlay = &tracks[0]
