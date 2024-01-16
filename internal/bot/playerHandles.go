@@ -21,12 +21,13 @@ func (b *Bot) onPlayerResume(player disgolink.Player, event lavalink.PlayerResum
 
 func (b *Bot) onTrackStart(player disgolink.Player, event lavalink.TrackStartEvent) {
 	fmt.Printf("onTrackStart: %v\n", event)
-	b.Session.UpdateGameStatus(0, player.Track().Info.Title)
+	b.Session.UpdateGameStatus(0, event.Track.Info.Title)
 }
 
 func (b *Bot) onTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) {
 
 	fmt.Printf("onTrackEnd: %v\n", event)
+
 	b.Session.UpdateGameStatus(0, StatusText)
 
 	if !event.Reason.MayStartNext() {

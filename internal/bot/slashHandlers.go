@@ -423,6 +423,8 @@ func (b *Bot) play(event *discordgo.InteractionCreate, data discordgo.Applicatio
 		return err
 	}
 
+	b.Session.UpdateGameStatus(0, toPlay.Info.Title)
+
 	return player.Update(context.TODO(), lavalink.WithTrack(*toPlay))
 }
 
