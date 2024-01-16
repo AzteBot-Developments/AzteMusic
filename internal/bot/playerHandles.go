@@ -11,10 +11,12 @@ import (
 
 func (b *Bot) onPlayerPause(player disgolink.Player, event lavalink.PlayerPauseEvent) {
 	fmt.Printf("onPlayerPause: %v\n", event)
+	b.Session.UpdateGameStatus(0, StatusText)
 }
 
 func (b *Bot) onPlayerResume(player disgolink.Player, event lavalink.PlayerResumeEvent) {
 	fmt.Printf("onPlayerResume: %v\n", event)
+	b.Session.UpdateGameStatus(0, player.Track().Info.Title)
 }
 
 func (b *Bot) onTrackStart(player disgolink.Player, event lavalink.TrackStartEvent) {
@@ -25,6 +27,7 @@ func (b *Bot) onTrackStart(player disgolink.Player, event lavalink.TrackStartEve
 func (b *Bot) onTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) {
 
 	fmt.Printf("onTrackEnd: %v\n", event)
+	b.Session.UpdateGameStatus(0, StatusText)
 
 	if !event.Reason.MayStartNext() {
 		return
@@ -68,16 +71,20 @@ func (b *Bot) onTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) 
 
 func (b *Bot) onTrackException(player disgolink.Player, event lavalink.TrackExceptionEvent) {
 	fmt.Printf("onTrackException: %v\n", event)
+	b.Session.UpdateGameStatus(0, StatusText)
 }
 
 func (b *Bot) onTrackStuck(player disgolink.Player, event lavalink.TrackStuckEvent) {
 	fmt.Printf("onTrackStuck: %v\n", event)
+	b.Session.UpdateGameStatus(0, StatusText)
 }
 
 func (b *Bot) onWebSocketClosed(player disgolink.Player, event lavalink.WebSocketClosedEvent) {
 	fmt.Printf("onWebSocketClosed: %v\n", event)
+	b.Session.UpdateGameStatus(0, StatusText)
 }
 
 func (b *Bot) onUnknownEvent(player disgolink.Player, event lavalink.UnknownEvent) {
 	fmt.Printf("onWebSocketClosed: %v\n", event)
+	b.Session.UpdateGameStatus(0, StatusText)
 }
