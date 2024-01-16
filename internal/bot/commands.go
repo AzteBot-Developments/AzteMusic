@@ -20,6 +20,18 @@ var Commands = []*discordgo.ApplicationCommand{
 		},
 	},
 	{
+		Name:        "play-loop",
+		Description: "Plays a given song in a loop, until stopped",
+		Options: []*discordgo.ApplicationCommandOption{
+			{
+				Type:        discordgo.ApplicationCommandOptionString,
+				Name:        "identifier",
+				Description: "The song link or search query",
+				Required:    true,
+			},
+		},
+	},
+	{
 		Name:        "pause",
 		Description: "Pauses the current song",
 	},
