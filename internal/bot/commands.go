@@ -20,6 +20,10 @@ var Commands = []*discordgo.ApplicationCommand{
 		},
 	},
 	{
+		Name:        "play_default",
+		Description: "Plays the default Azteca Essentials playlist",
+	},
+	{
 		Name:        "play-loop",
 		Description: "Plays a given song in a loop, until stopped",
 		Options: []*discordgo.ApplicationCommandOption{
@@ -93,16 +97,17 @@ var Commands = []*discordgo.ApplicationCommand{
 
 func (b *Bot) RegisterCommands() {
 	b.Handlers = map[string]func(event *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error{
-		"play":        b.play,
-		"pause":       b.pause,
-		"skip":        b.skip,
-		"now-playing": b.nowPlaying,
-		"stop":        b.stop,
-		"queue":       b.queue,
-		"clear-queue": b.clearQueue,
-		"queue-type":  b.queueType,
-		"shuffle":     b.shuffle,
-		"help":        b.help,
+		"play":         b.play,
+		"play_default": b.play_default,
+		"pause":        b.pause,
+		"skip":         b.skip,
+		"now-playing":  b.nowPlaying,
+		"stop":         b.stop,
+		"queue":        b.queue,
+		"clear-queue":  b.clearQueue,
+		"queue-type":   b.queueType,
+		"shuffle":      b.shuffle,
+		"help":         b.help,
 	}
 
 	if _, err := b.Session.ApplicationCommandBulkOverwrite(b.Session.State.User.ID, GuildId, Commands); err != nil {

@@ -464,3 +464,118 @@ func (b *Bot) help(event *discordgo.InteractionCreate, data discordgo.Applicatio
 		},
 	})
 }
+
+func (b *Bot) play_default(event *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
+
+	identifier := DesignatedPlaylistUrl
+	if !urlPattern.MatchString(identifier) && !searchPattern.MatchString(identifier) {
+		identifier = lavalink.SearchTypeYouTube.Apply(identifier)
+	}
+
+	if err := b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+	}); err != nil {
+		return err
+	}
+
+	player := b.Lavalink.Player(snowflake.MustParse(event.GuildID))
+	queue := b.Queues.Get(event.GuildID)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var toPlay *lavalink.Track
+	b.Lavalink.BestNode().LoadTracksHandler(ctx, identifier, disgolink.NewResultHandler(
+		func(track lavalink.Track) {
+			// Embed build
+			embed := shared.NewEmbed().
+				SetTitle("🎵  Loading Default Track").
+				SetDescription(
+					fmt.Sprintf("`%s` (%s).\nTrack Duration: %s", track.Info.Title, *track.Info.URI, formatPosition(track.Info.Length))).
+				SetThumbnail(*track.Info.ArtworkURL).
+				SetColor(000000)
+
+			// Interaction response
+			_, _ = b.Session.InteractionResponseEdit(event.Interaction, &discordgo.WebhookEdit{
+				Embeds: &[]*discordgo.MessageEmbed{embed.MessageEmbed},
+			})
+
+			// Queue handling
+			if player.Track() == nil {
+				toPlay = &track
+			} else {
+				queue.Add(track)
+			}
+		},
+		func(playlist lavalink.Playlist) {
+			// Calculate total length of loaded playlist
+			var totalDurationSec int64
+			for _, track := range playlist.Tracks {
+				totalDurationSec += track.Info.Length.Seconds()
+			}
+
+			// Embed build
+			embed := shared.NewEmbed().
+				SetTitle(fmt.Sprintf("🎵  Loading Default Playlist `%s` with `%d` tracks", playlist.Info.Name, len(playlist.Tracks))).
+				SetDescription(
+					fmt.Sprintf("Playlist Duration: %s.\nFirst track in playlist: `%s` (%s)", shared.FormatDuration(totalDurationSec), playlist.Tracks[0].Info.Title, *playlist.Tracks[0].Info.URI)).
+				SetThumbnail(*playlist.Tracks[0].Info.ArtworkURL).
+				SetColor(000000)
+
+			// Interaction response
+			_, _ = b.Session.InteractionResponseEdit(event.Interaction, &discordgo.WebhookEdit{
+				Embeds: &[]*discordgo.MessageEmbed{embed.MessageEmbed},
+			})
+
+			// Queue handling
+			if player.Track() == nil {
+				toPlay = &playlist.Tracks[0]
+				queue.Add(playlist.Tracks[1:]...)
+			} else {
+				queue.Add(playlist.Tracks...)
+			}
+		},
+		func(tracks []lavalink.Track) {
+			// Embed build
+			embed := shared.NewEmbed().
+				SetTitle("🎵  Loading Default Track").
+				SetDescription(
+					fmt.Sprintf("`%s` (%s).\nTrack Duration: %s", tracks[0].Info.Title, *tracks[0].Info.URI, formatPosition(tracks[0].Info.Length))).
+				SetThumbnail(*tracks[0].Info.ArtworkURL).
+				SetColor(000000)
+
+			// Interaction response
+			_, _ = b.Session.InteractionResponseEdit(event.Interaction, &discordgo.WebhookEdit{
+				Embeds: &[]*discordgo.MessageEmbed{embed.MessageEmbed},
+			})
+
+			// Queue handling
+			if player.Track() == nil {
+				toPlay = &tracks[0]
+			} else {
+				queue.Add(tracks[0])
+			}
+		},
+		func() {
+			_, _ = b.Session.InteractionResponseEdit(event.Interaction, &discordgo.WebhookEdit{
+				Content: json.Ptr(fmt.Sprintf("Nothing found for: `%s`", identifier)),
+			})
+		},
+		func(err error) {
+			_, _ = b.Session.InteractionResponseEdit(event.Interaction, &discordgo.WebhookEdit{
+				Content: json.Ptr(fmt.Sprintf("Error while looking up query: `%s`", err)),
+			})
+		},
+	))
+	if toPlay == nil {
+		return nil
+	}
+
+	if err := b.Session.ChannelVoiceJoinManual(GuildId, DesignatedChannelId, false, false); err != nil {
+		return err
+	}
+
+	b.Session.UpdateGameStatus(0, toPlay.Info.Title)
+
+	return player.Update(context.TODO(), lavalink.WithTrack(*toPlay))
+}
