@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1
-
 # Base Image
 FROM golang:1.21
 
