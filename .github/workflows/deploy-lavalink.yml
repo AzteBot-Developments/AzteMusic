@@ -32,6 +32,7 @@ env:
   GKE_REGION: europe-west2 # TODO: Try and make this follow the instance zone declared in the infrastructure repo ?
   CLUSTER_NAME: ${{ secrets.GKE_CLUSTER_NAME }}
   LAVALINK_IMAGE: lavalink-service
+  LAVALINK_CONFIG_ENCODED: ${{ secrets.LAVALINK_CONFIG_ENCODED }}
 
 jobs:
 
@@ -48,7 +49,7 @@ jobs:
       - name: Setup environment
         run: |
           : # Configuration file for LavaLink server
-          echo ${{ secrets.LAVALINK_CONFIG_BASE64 }} | base64 --decode > internal/lavalink/application.yml
+          echo ${{ env.LAVALINK_CONFIG_ENCODED }} | base64 --decode > internal/lavalink/application.yml
 
       - name: Generate SHA output
         id: vars
