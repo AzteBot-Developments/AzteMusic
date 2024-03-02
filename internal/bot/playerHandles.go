@@ -38,8 +38,8 @@ func (b *Bot) onTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) 
 
 	// in the case of the radio service, we can check here whether the queue is empty
 	// if it is, play form url again
-	if len(queue.Tracks) == 0 && DesignatedPlaylistUrl != "" && DesignatedChannelId != "" {
-		b.AddToQueueFromSource(DesignatedPlaylistUrl, 10)
+	if len(queue.Tracks) < 2 && DesignatedPlaylistUrl != "" && DesignatedChannelId != "" {
+		b.AddToQueueFromSource(DesignatedPlaylistUrl, 3)
 	}
 
 	var (
@@ -59,12 +59,18 @@ func (b *Bot) onTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) 
 	}
 
 	if !ok {
-		// No tracks on the queue, or could not play next, so can safely disconnect from the VC to save resources.
-		if err := b.Session.ChannelVoiceJoinManual(GuildId, "", false, false); err != nil {
-			fmt.Printf("[onTrackEnd] Error ocurred when disconnecting from VC: %v", err)
+		// retry to play designated playlist
+		if DesignatedPlaylistUrl != "" && DesignatedChannelId != "" {
+			b.AddToQueueFromSource(DesignatedPlaylistUrl, 3)
+		} else {
+			// No tracks on the queue, or could not play next, so can safely disconnect from the VC to save resources.
+			if err := b.Session.ChannelVoiceJoinManual(GuildId, "", false, false); err != nil {
+				fmt.Printf("[onTrackEnd] Error ocurred when disconnecting from VC: %v", err)
+			}
+			return
 		}
-		return
 	}
+
 	if err := player.Update(context.TODO(), lavalink.WithTrack(nextTrack)); err != nil {
 		log.Fatal("Failed to play next track: ", err)
 	}
