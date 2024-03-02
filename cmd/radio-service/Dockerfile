@@ -1,5 +1,5 @@
 # Base Image
-FROM golang:1.21
+FROM golang:latest
 
 WORKDIR /app
 
