@@ -87,8 +87,10 @@ func (b *Bot) PlayOnStartupFromSource(event *discordgo.Ready, url string, repeat
 				for i := 0; i < repeatCount; i++ {
 					queue.Add(playlist.Tracks[0:]...)
 				}
+				queue.Shuffle()
 			} else {
 				queue.Add(playlist.Tracks...)
+				queue.Shuffle()
 			}
 		},
 		func(tracks []lavalink.Track) {
@@ -111,4 +113,15 @@ func (b *Bot) PlayOnStartupFromSource(event *discordgo.Ready, url string, repeat
 	}
 
 	return player.Update(context.TODO(), lavalink.WithTrack(*toPlay))
+}
+
+func ServiceIsPlayingTrack(b *Bot, guildId string) bool {
+	player := b.Lavalink.ExistingPlayer(snowflake.MustParse(guildId))
+	if player == nil {
+		return false
+	}
+
+	track := player.Track()
+
+	return track != nil
 }

@@ -28,6 +28,8 @@ func (b *Bot) onReady(s *discordgo.Session, event *discordgo.Ready) {
 	}
 
 	// Join designated channel
+	repeatPlaylistCount := 3
+
 	if DesignatedChannelId != "" {
 		if err := s.ChannelVoiceJoinManual(GuildId, DesignatedChannelId, false, false); err != nil {
 			log.Fatalf("Could not join designated voice channel (onReady): %v", err)
@@ -35,11 +37,31 @@ func (b *Bot) onReady(s *discordgo.Session, event *discordgo.Ready) {
 
 		// Play designated playlist on loop, FOREVER :')
 		if DesignatedPlaylistUrl != "" {
-			repeatPlaylistCount := 10
 			if err := b.PlayOnStartupFromSource(event, DesignatedPlaylistUrl, repeatPlaylistCount); err != nil {
 				log.Fatalf("Could not play designated playlist (onReady): %v", err)
 			}
 		}
+
+		// Also run a cron to check whether there is anything playing - if there isn't, shuffle and play the designated playlist
+		var numSec int = 15
+		ticker := time.NewTicker(time.Duration(numSec) * time.Second)
+		quit := make(chan struct{})
+		go func() {
+			for {
+				select {
+				case <-ticker.C:
+					serverQueue := b.Queues.Get(GuildId)
+					if len(serverQueue.Tracks) == 0 || !ServiceIsPlayingTrack(b, GuildId) {
+						if err := b.PlayOnStartupFromSource(event, DesignatedPlaylistUrl, repeatPlaylistCount); err != nil {
+							log.Printf("Could not play designated playlist (onReady CRON): %v", err)
+						}
+					}
+				case <-quit:
+					ticker.Stop()
+					return
+				}
+			}
+		}()
 	}
 
 }
