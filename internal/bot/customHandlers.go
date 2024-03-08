@@ -43,7 +43,7 @@ func (b *Bot) onReady(s *discordgo.Session, event *discordgo.Ready) {
 		}
 
 		// Also run a cron to check whether there is anything playing - if there isn't, shuffle and play the designated playlist
-		var numSec int = 15
+		var numSec int = 300
 		ticker := time.NewTicker(time.Duration(numSec) * time.Second)
 		quit := make(chan struct{})
 		go func() {
