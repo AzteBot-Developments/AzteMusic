@@ -52,16 +52,16 @@ jobs:
 
       - name: Setup environment
         env: 
-          AZTERADIO_CONFIG_ENCODED: ${{ secrets.AZTERADIO_CONFIG_ENCODED }}
-          AZTEMUSIC_1_CONFIG_BASE64: ${{ secrets.AZTEMUSIC_SERVICE_1_CONFIGURATION_BASE64 }}
-          AZTEMUSIC_2_CONFIG_BASE64: ${{ secrets.AZTEMUSIC_SERVICE_2_CONFIGURATION_BASE64 }}
-          AZTEMUSIC_3_CONFIG_BASE64: ${{ secrets.AZTEMUSIC_SERVICE_3_CONFIGURATION_BASE64 }}
+          AZTERADIO_CONFIG_ENCODED: ${{ secrets.AZTERADIO_CONFIG_ENCODED_BASE64 }}
+          AZTEMUSIC_1_CONFIG_ENCODED: ${{ secrets.AZTEMUSIC_1_CONFIG_ENCODED }}
+          AZTEMUSIC_2_CONFIG_ENCODED: ${{ secrets.AZTEMUSIC_2_CONFIG_ENCODED }}
+          AZTEMUSIC_3_CONFIG_ENCODED: ${{ secrets.AZTEMUSIC_3_CONFIG_ENCODED }}
         run: |
           : # Environment variables for all the music services
           echo ${{ env.AZTERADIO_CONFIG_ENCODED }} | base64 --decode > cmd/radio-service/.env
-          echo ${{ env.AZTEMUSIC_1_CONFIG_BASE64 }} | base64 --decode > cmd/music-service/1/.env
-          echo ${{ env.AZTEMUSIC_2_CONFIG_BASE64 }} | base64 --decode > cmd/music-service/2/.env
-          echo ${{ env.AZTEMUSIC_3_CONFIG_BASE64 }} | base64 --decode > cmd/music-service/3/.env
+          echo ${{ env.AZTEMUSIC_1_CONFIG_ENCODED }} | base64 --decode > cmd/music-service/1/.env
+          echo ${{ env.AZTEMUSIC_2_CONFIG_ENCODED }} | base64 --decode > cmd/music-service/2/.env
+          echo ${{ env.AZTEMUSIC_3_CONFIG_ENCODED }} | base64 --decode > cmd/music-service/3/.env
 
       - name: Generate SHA output
         id: vars
