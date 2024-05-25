@@ -1,7 +1,11 @@
 .github/
 .gitignore
+.gitmodules
+.git/
+
 *.md
 
+.dockerignore
 Dockerfile
 docker-compose.yml
 build/
