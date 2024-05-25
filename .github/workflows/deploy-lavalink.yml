@@ -32,7 +32,7 @@ env:
   GKE_REGION: europe-west2 # TODO: Try and make this follow the instance zone declared in the infrastructure repo ?
   CLUSTER_NAME: ${{ secrets.GKE_CLUSTER_NAME }}
   LAVALINK_IMAGE: lavalink-service
-  LAVALINK_CONFIG_ENCODED: ${{ secrets.LAVALINK_CONFIG_ENCODED }}
+  LAVALINK_CONFIG_ENCODED: ${{ secrets.LAVALINK_CONFIG_ENCODED_BASE64 }}
 
 jobs:
 
