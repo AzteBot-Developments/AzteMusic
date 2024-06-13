@@ -584,11 +584,12 @@ func (b *Bot) loop(event *discordgo.InteractionCreate, data discordgo.Applicatio
 
 	loopModifier := data.Options[0].StringValue()
 
+	player := b.Lavalink.Player(snowflake.MustParse(event.GuildID))
 	queue := b.Queues.Get(event.GuildID)
 
 	switch loopModifier {
 	case "start":
-		var currentlyPlaying *lavalink.Track = queue.Peek()
+		var currentlyPlaying *lavalink.Track = player.Track()
 		if currentlyPlaying == nil {
 			return fmt.Errorf("no song is currently playing in order to loop it")
 		}
