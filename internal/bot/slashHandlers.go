@@ -589,6 +589,9 @@ func (b *Bot) loop(event *discordgo.InteractionCreate, data discordgo.Applicatio
 	switch loopModifier {
 	case "start":
 		var currentlyPlaying *lavalink.Track = queue.Peek()
+		if currentlyPlaying == nil {
+			return fmt.Errorf("no song is currently playing in order to loop it")
+		}
 		const count = 10000
 		for range count {
 			queue.Add(*currentlyPlaying)

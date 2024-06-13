@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/AzteBot-Developments/AzteMusic/pkg/shared"
@@ -72,6 +73,12 @@ func (b *Bot) onApplicationCommand(session *discordgo.Session, event *discordgo.
 		return
 	}
 	if err := handler(event, data); err != nil {
-		log.Println("error handling command: ", err)
+		session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: fmt.Sprintf("An error ocurred while running the command: %v", err),
+			},
+		})
+		return
 	}
 }
