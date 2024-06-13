@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/AzteBot-Developments/AzteMusic/pkg/shared"
@@ -67,33 +66,13 @@ func (b *Bot) onApplicationCommand(session *discordgo.Session, event *discordgo.
 		}
 	}
 
-	// Initial response
-	session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		Data: &discordgo.InteractionResponseData{
-			Content: fmt.Sprintf("Handling a `%s` command...", data.Name),
-		},
-	})
-
 	handler, ok := b.Handlers[data.Name]
 	if !ok {
 		log.Println("unknown command: ", data.Name)
 		return
 	}
 	if err := handler(event, data); err != nil {
-		session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Content: fmt.Sprintf("An error ocurred while running the `/%s` command: %v", data.Name, err),
-			},
-		})
+		log.Printf("error ocurred for %s: %v\n", data.Name, err)
 		return
 	}
-
-	// Final response
-	editContent := fmt.Sprintf("Successfully executed a `/%s` command !", data.Name)
-	editWebhook := discordgo.WebhookEdit{
-		Content: &editContent,
-	}
-	session.InteractionResponseEdit(event.Interaction, &editWebhook)
 }

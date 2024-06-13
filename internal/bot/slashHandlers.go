@@ -591,7 +591,9 @@ func (b *Bot) loop(event *discordgo.InteractionCreate, data discordgo.Applicatio
 	case "start":
 		var currentlyPlaying *lavalink.Track = player.Track()
 		if currentlyPlaying == nil {
-			return fmt.Errorf("no song is currently playing in order to loop it")
+			_, _ = b.Session.InteractionResponseEdit(event.Interaction, &discordgo.WebhookEdit{
+				Content: json.Ptr("no song is currently playing in order to loop it"),
+			})
 		}
 		const count = 512
 		for range count {
