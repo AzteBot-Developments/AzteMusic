@@ -579,3 +579,23 @@ func (b *Bot) play_default(event *discordgo.InteractionCreate, data discordgo.Ap
 
 	return player.Update(context.TODO(), lavalink.WithTrack(*toPlay))
 }
+
+func (b *Bot) loop(event *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
+
+	loopModifier := data.Options[0].StringValue()
+
+	queue := b.Queues.Get(event.GuildID)
+
+	switch loopModifier {
+	case "start":
+		var currentlyPlaying *lavalink.Track = queue.Peek()
+		const count = 10000
+		for range count {
+			queue.Add(*currentlyPlaying)
+		}
+	case "stop":
+		queue.Clear()
+	}
+
+	return nil
+}

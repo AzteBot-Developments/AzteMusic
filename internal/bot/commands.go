@@ -24,14 +24,24 @@ var Commands = []*discordgo.ApplicationCommand{
 		Description: "Plays the default Azteca Essentials playlist",
 	},
 	{
-		Name:        "play-loop",
-		Description: "Plays a given song in a loop, until stopped",
+		Name:        "loop",
+		Description: "Plays the currently playing song in a loop, until stopped",
 		Options: []*discordgo.ApplicationCommandOption{
 			{
 				Type:        discordgo.ApplicationCommandOptionString,
-				Name:        "identifier",
-				Description: "The song link or search query",
+				Name:        "loop-modifier",
+				Description: "Select the action to use for the loop function.",
 				Required:    true,
+				Choices: []*discordgo.ApplicationCommandOptionChoice{
+					{
+						Name:  "Loop Current Song",
+						Value: "start",
+					},
+					{
+						Name:  "Stop Loop",
+						Value: "stop",
+					},
+				},
 			},
 		},
 	},
@@ -107,6 +117,7 @@ func (b *Bot) RegisterCommands() {
 		"clear-queue":  b.clearQueue,
 		"queue-type":   b.queueType,
 		"shuffle":      b.shuffle,
+		"loop":         b.loop,
 		"help":         b.help,
 	}
 
