@@ -582,6 +582,12 @@ func (b *Bot) play_default(event *discordgo.InteractionCreate, data discordgo.Ap
 
 func (b *Bot) loop(event *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
 
+	if err := b.Session.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+	}); err != nil {
+		return err
+	}
+
 	loopModifier := data.Options[0].StringValue()
 
 	player := b.Lavalink.Player(snowflake.MustParse(event.GuildID))
@@ -602,6 +608,10 @@ func (b *Bot) loop(event *discordgo.InteractionCreate, data discordgo.Applicatio
 	case "stop":
 		queue.Clear()
 	}
+
+	_, _ = b.Session.InteractionResponseEdit(event.Interaction, &discordgo.WebhookEdit{
+		Content: json.Ptr(fmt.Sprintf("Successfully executed a `/%s` command !", data.Name)),
+	})
 
 	return nil
 }
