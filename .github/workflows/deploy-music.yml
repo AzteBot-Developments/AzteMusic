@@ -52,10 +52,10 @@ jobs:
 
       - name: Setup environment
         env: 
-          AZTERADIO_CONFIG_ENCODED: ${{ secrets.AZTERADIO_CONFIG_ENCODED_BASE64 }}
-          AZTEMUSIC_1_CONFIG_ENCODED: ${{ secrets.AZTEMUSIC_1_CONFIG_ENCODED }}
-          AZTEMUSIC_2_CONFIG_ENCODED: ${{ secrets.AZTEMUSIC_2_CONFIG_ENCODED }}
-          AZTEMUSIC_3_CONFIG_ENCODED: ${{ secrets.AZTEMUSIC_3_CONFIG_ENCODED }}
+          AZTERADIO_CONFIG_ENCODED: ${{ secrets.AZTERADIO_CONFIG_ENCODED }}
+          AZTEMUSIC_1_CONFIG_ENCODED: ${{ secrets.AZTEMUSIC_1_CONFIG_ENCODED_BASE64 }}
+          AZTEMUSIC_2_CONFIG_ENCODED: ${{ secrets.AZTEMUSIC_2_CONFIG_ENCODED_BASE64 }}
+          AZTEMUSIC_3_CONFIG_ENCODED: ${{ secrets.AZTEMUSIC_3_CONFIG_ENCODED_BASE64 }}
         run: |
           : # Environment variables for all the music services
           echo ${{ env.AZTERADIO_CONFIG_ENCODED }} | base64 --decode > cmd/radio-service/.env
