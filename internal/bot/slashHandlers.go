@@ -465,7 +465,7 @@ func (b *Bot) help(event *discordgo.InteractionCreate, data discordgo.Applicatio
 	})
 }
 
-func (b *Bot) play_default(event *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
+func (b *Bot) playDefault(event *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
 
 	identifier := DesignatedPlaylistUrl
 	if !urlPattern.MatchString(identifier) && !searchPattern.MatchString(identifier) {

@@ -20,7 +20,7 @@ var Commands = []*discordgo.ApplicationCommand{
 		},
 	},
 	{
-		Name:        "play_default",
+		Name:        "play-default",
 		Description: "Plays the default Azteca Essentials playlist",
 	},
 	{
@@ -108,7 +108,7 @@ var Commands = []*discordgo.ApplicationCommand{
 func (b *Bot) RegisterCommands() {
 	b.Handlers = map[string]func(event *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error{
 		"play":         b.play,
-		"play_default": b.play_default,
+		"play-default": b.playDefault,
 		"pause":        b.pause,
 		"skip":         b.skip,
 		"now-playing":  b.nowPlaying,
