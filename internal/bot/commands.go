@@ -20,10 +20,6 @@ var Commands = []*discordgo.ApplicationCommand{
 		},
 	},
 	{
-		Name:        "play-default",
-		Description: "Plays the default Azteca Essentials playlist",
-	},
-	{
 		Name:        "loop",
 		Description: "Plays the currently playing song in a loop, until stopped",
 		Options: []*discordgo.ApplicationCommandOption{
