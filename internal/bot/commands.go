@@ -59,7 +59,7 @@ var Commands = []*discordgo.ApplicationCommand{
 	},
 	{
 		Name:        "now-playing",
-		Description: "Shows the current playing song",
+		Description: "Shows the currently playing song",
 	},
 	{
 		Name:        "stop",
