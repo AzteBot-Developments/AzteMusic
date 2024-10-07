@@ -65,7 +65,7 @@ func main() {
 		b.AddLavalinkNode(ctx)
 	}
 
-	log.Printf("Discord bot is now running. Press CTRL-C to exit.")
+	log.Printf("Discord music bot is now running. Press CTRL-C to exit.")
 	s := make(chan os.Signal, 1)
 	signal.Notify(s, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-s
