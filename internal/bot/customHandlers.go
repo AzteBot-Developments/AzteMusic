@@ -18,7 +18,7 @@ func (b *Bot) onReady(s *discordgo.Session, event *discordgo.Ready) {
 		b.AddLavalinkNode(ctx)
 	}
 
-	// Any initial setup for the music service !
+	// Any initial setup for the music service !!
 	// i.e join designated server, play designated playlist, etc.
 
 	// Set the playing status
